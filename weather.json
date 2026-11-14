@@ -1,32 +1,30 @@
 {
   "schema_version": 1,
   "version": "3.6.5",
-  "timestamp": "2026-11-14 20:31 UTC",
-  "generated_at": "2026-11-14T20:31:01Z",
-  "valid_until": "2026-11-14T23:01:01Z",
-  "run_status": "DEGRADED",
-  "run_duration_seconds": 20.57,
+  "timestamp": "2026-11-14 21:00 UTC",
+  "generated_at": "2026-11-14T21:00:50Z",
+  "valid_until": "2026-11-14T23:30:50Z",
+  "run_status": "COMPLETE",
+  "run_duration_seconds": 2.96,
   "symbol": "☀️",
-  "composite_score": 18,
-  "composite_raw": 18.2,
-  "display_score": 18,
+  "composite_score": 17,
+  "composite_raw": 17.6,
+  "display_score": 17,
   "status": "CLEAR SKIES",
   "desc": "Systemic friction minimal. Normal market conditions across macro and crypto feeds.",
   "color": "#00ff66",
   "data_quality": {
-    "status": "MEDIUM",
-    "score": 85,
-    "fallback_count": 1,
+    "status": "HIGH",
+    "score": 100,
+    "fallback_count": 0,
     "stale_count": 0,
-    "degraded_feeds": [
-      "tga"
-    ]
+    "degraded_feeds": []
   },
   "fallback_flags": {
     "market_volatility": false,
     "crypto_leverage": false,
     "short_volume": false,
-    "dollar_liquidity": true,
+    "dollar_liquidity": false,
     "credit_stress": false,
     "odds_and_ends": false
   },
@@ -44,8 +42,7 @@
       "status": "OK"
     },
     "tga": {
-      "status": "FALLBACK",
-      "error_type": "HTTP_5XX"
+      "status": "OK"
     },
     "ny_fed": {
       "status": "OK"
@@ -71,25 +68,25 @@
     "recovery_target": null,
     "status_changed": false,
     "market_status": "CAUTION",
-    "clean_runs": 0
+    "clean_runs": 1
   },
   "tactical_posture": {
     "grid_bots": {
       "status": "CAUTION",
       "color": "#ffcc00",
-      "action": "Reference: wider grid bands (+15-25%). Return band active (VIX 19.30 >= 18.5, upstream data quality is degraded).",
+      "action": "Reference: wider grid bands (+15-25%). Return band active (VIX 19.30 >= 18.5).",
       "hysteresis": true,
       "confirmed_runs": 0
     },
     "dip_buying": {
-      "status": "DEFENSIVE",
-      "color": "#ff6600",
-      "action": "Support looks fragile; falling-knife risk is elevated."
+      "status": "FAVORABLE",
+      "color": "#00ff66",
+      "action": "Orderly pullbacks. Liquidity supports absorption."
     },
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Moderate derivatives bias (+4.3% APR)."
+      "action": "Neutral baseline funding (+11.0% APR)."
     },
     "dark_pool": {
       "status": "NOMINAL",
@@ -110,10 +107,10 @@
       "fallback": false
     },
     "crypto_leverage": {
-      "score": 13,
-      "btc_funding_apr": 4.3,
-      "btc_oi_mil": 2438.0,
-      "dvol_index": 46.7,
+      "score": 10,
+      "btc_funding_apr": 11.0,
+      "btc_oi_mil": 2377.6,
+      "dvol_index": 47.9,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -126,11 +123,11 @@
     },
     "dollar_liquidity": {
       "score": 10,
-      "tga_billions": 850.0,
-      "tga_5d_flow": 0.0,
+      "tga_billions": 933.1,
+      "tga_5d_flow": 10.4,
       "swaps_billions": 0.0,
-      "fallback": true,
-      "tga_fallback": true,
+      "fallback": false,
+      "tga_fallback": false,
       "swaps_fallback": false
     },
     "credit_stress": {
@@ -155,10 +152,10 @@
       "fallback": false
     },
     "crypto_247": {
-      "score": 13,
-      "btc_funding_apr": 4.3,
-      "btc_oi_mil": 2438.0,
-      "dvol_index": 46.7,
+      "score": 10,
+      "btc_funding_apr": 11.0,
+      "btc_oi_mil": 2377.6,
+      "dvol_index": 47.9,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -171,11 +168,11 @@
     },
     "liquidity_plumbing": {
       "score": 10,
-      "tga_billions": 850.0,
-      "tga_5d_flow": 0.0,
+      "tga_billions": 933.1,
+      "tga_5d_flow": 10.4,
       "swaps_billions": 0.0,
-      "fallback": true,
-      "tga_fallback": true,
+      "fallback": false,
+      "tga_fallback": false,
       "swaps_fallback": false
     },
     "credit_statutory": {
