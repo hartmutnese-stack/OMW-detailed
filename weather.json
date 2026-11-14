@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.6.5",
-  "timestamp": "2026-11-14 22:30 UTC",
-  "generated_at": "2026-11-14T22:30:38Z",
-  "valid_until": "2026-11-15T01:00:38Z",
+  "timestamp": "2026-11-14 23:00 UTC",
+  "generated_at": "2026-11-14T23:00:49Z",
+  "valid_until": "2026-11-15T01:30:49Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 4.77,
+  "run_duration_seconds": 4.19,
   "symbol": "☀️",
-  "composite_score": 19,
-  "composite_raw": 19.2,
-  "display_score": 19,
+  "composite_score": 17,
+  "composite_raw": 17.5,
+  "display_score": 17,
   "status": "CLEAR SKIES",
   "desc": "Systemic friction minimal. Normal market conditions across macro and crypto feeds.",
   "color": "#00ff66",
@@ -86,7 +86,7 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Moderate derivatives bias (+1.7% APR)."
+      "action": "Neutral baseline funding (+11.0% APR)."
     },
     "dark_pool": {
       "status": "NOMINAL",
@@ -107,10 +107,10 @@
       "fallback": false
     },
     "crypto_leverage": {
-      "score": 16,
-      "btc_funding_apr": 1.7,
-      "btc_oi_mil": 2317.7,
-      "dvol_index": 46.7,
+      "score": 10,
+      "btc_funding_apr": 11.0,
+      "btc_oi_mil": 2319.0,
+      "dvol_index": 47.7,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -136,10 +136,10 @@
       "fallback": false
     },
     "odds_and_ends": {
-      "score": 8,
+      "score": 3,
       "wiki_z": 0.23,
       "wiki_articles_ok": 4,
-      "border_wait_m": 30,
+      "border_wait_m": 0,
       "border_state": "OBSERVED",
       "fallback": false,
       "wiki_fallback": false,
@@ -152,10 +152,10 @@
       "fallback": false
     },
     "crypto_247": {
-      "score": 16,
-      "btc_funding_apr": 1.7,
-      "btc_oi_mil": 2317.7,
-      "dvol_index": 46.7,
+      "score": 10,
+      "btc_funding_apr": 11.0,
+      "btc_oi_mil": 2319.0,
+      "dvol_index": 47.7,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -181,10 +181,10 @@
       "fallback": false
     },
     "cognitive_physical": {
-      "score": 8,
+      "score": 3,
       "wiki_z": 0.23,
       "wiki_articles_ok": 4,
-      "border_wait_m": 30,
+      "border_wait_m": 0,
       "border_state": "OBSERVED",
       "fallback": false,
       "wiki_fallback": false,
