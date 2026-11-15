@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.6.5",
-  "timestamp": "2026-11-15 22:08 UTC",
-  "generated_at": "2026-11-15T22:08:12Z",
-  "valid_until": "2026-11-16T00:38:12Z",
+  "timestamp": "2026-11-15 22:31 UTC",
+  "generated_at": "2026-11-15T22:31:03Z",
+  "valid_until": "2026-11-16T01:01:03Z",
   "run_status": "DEGRADED",
-  "run_duration_seconds": 24.77,
+  "run_duration_seconds": 25.0,
   "symbol": "☀️",
-  "composite_score": 17,
-  "composite_raw": 17.3,
-  "display_score": 17,
+  "composite_score": 16,
+  "composite_raw": 16.4,
+  "display_score": 16,
   "status": "CLEAR SKIES",
   "desc": "Systemic friction minimal. Normal market conditions across macro and crypto feeds.",
   "color": "#00ff66",
@@ -58,7 +58,8 @@
       "detail": "4/6 articles usable"
     },
     "cbp": {
-      "status": "OK"
+      "status": "CLOSED",
+      "detail": "Laredo feed reachable; no delay value"
     }
   },
   "transition": {
@@ -110,10 +111,10 @@
       "fallback": false
     },
     "crypto_leverage": {
-      "score": 7,
+      "score": 6,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2395.2,
-      "dvol_index": 44.3,
+      "btc_oi_mil": 2406.2,
+      "dvol_index": 44.2,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -139,11 +140,11 @@
       "fallback": false
     },
     "odds_and_ends": {
-      "score": 7,
+      "score": 0,
       "wiki_z": 0.0,
       "wiki_articles_ok": 4,
-      "border_wait_m": 35,
-      "border_state": "OBSERVED",
+      "border_wait_m": null,
+      "border_state": "CLOSED",
       "fallback": false,
       "wiki_fallback": false,
       "cbp_fallback": false
@@ -155,10 +156,10 @@
       "fallback": false
     },
     "crypto_247": {
-      "score": 7,
+      "score": 6,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2395.2,
-      "dvol_index": 44.3,
+      "btc_oi_mil": 2406.2,
+      "dvol_index": 44.2,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -184,11 +185,11 @@
       "fallback": false
     },
     "cognitive_physical": {
-      "score": 7,
+      "score": 0,
       "wiki_z": 0.0,
       "wiki_articles_ok": 4,
-      "border_wait_m": 35,
-      "border_state": "OBSERVED",
+      "border_wait_m": null,
+      "border_state": "CLOSED",
       "fallback": false,
       "wiki_fallback": false,
       "cbp_fallback": false
