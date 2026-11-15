@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
   "version": "3.6.5",
-  "timestamp": "2026-11-15 20:01 UTC",
-  "generated_at": "2026-11-15T20:01:13Z",
-  "valid_until": "2026-11-15T22:31:13Z",
+  "timestamp": "2026-11-15 20:30 UTC",
+  "generated_at": "2026-11-15T20:30:58Z",
+  "valid_until": "2026-11-15T23:00:58Z",
   "run_status": "DEGRADED",
-  "run_duration_seconds": 25.59,
+  "run_duration_seconds": 25.35,
   "symbol": "☀️",
   "composite_score": 17,
-  "composite_raw": 17.1,
+  "composite_raw": 17.3,
   "display_score": 17,
   "status": "CLEAR SKIES",
   "desc": "Systemic friction minimal. Normal market conditions across macro and crypto feeds.",
@@ -110,10 +110,10 @@
       "fallback": false
     },
     "crypto_leverage": {
-      "score": 6,
+      "score": 7,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2343.7,
-      "dvol_index": 44.2,
+      "btc_oi_mil": 2330.9,
+      "dvol_index": 44.4,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -155,10 +155,10 @@
       "fallback": false
     },
     "crypto_247": {
-      "score": 6,
+      "score": 7,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2343.7,
-      "dvol_index": 44.2,
+      "btc_oi_mil": 2330.9,
+      "dvol_index": 44.4,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
