@@ -1,7 +1,7 @@
 
 ======================================================================
  OPEN MARKET WEATHER OBSERVATORY // HYBRID MACRO & CRYPTO // v3.6.5
- 2026-11-15 19:31 UTC // DEGRADED // VALID UNTIL 2026-11-15T22:01:06Z
+ 2026-11-15 20:01 UTC // DEGRADED // VALID UNTIL 2026-11-15T22:31:13Z
 ======================================================================
 
  SCOPE: Experimental rule-based macro regime observer.
@@ -25,7 +25,7 @@
  [3] Short Volume      : Score 0/100 (Short ratio: 44.0% (20261113))
  [4] Dollar Liquidity  : Score 10/100 (TGA: $850.0B | Swaps: $0.0B) [fallback: tga]
  [5] Credit Stress     : Score 44/100 (Filings: 17)
- [6] Odds and Ends     : Score 15/100 (Wiki Z: +0.0σ | Border: 55m)
+ [6] Odds and Ends     : Score 7/100 (Wiki Z: +0.0σ | Border: 35m)
 
  API: curl -sL https://open-market-weather.hartmut-nese.workers.dev/weather.json
  REPO: https://github.com/hartmutnese-stack/open-market-weather
