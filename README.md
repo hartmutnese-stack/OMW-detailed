@@ -1,13 +1,15 @@
-# open-market-weather
+# OMW-detailed (Open Market Weather)
 
-A weather report for the markets. One Python script pulls a handful of public data feeds, squeezes them into a single score between 0 and 100, and displays it the way a weather app would: ☀️ when things look calm, ⛈️ when they don't.
+A weather report for the markets, paired with a single-stock fragility check. One Python script pulls a handful of public macro and crypto feeds, squeezes them into a single score between 0 and 100, and displays it the way a weather app would: ☀️ when things look calm, ⛈️ when they don't. A Cloudflare Worker alongside it lets you inspect structural tension for any individual stock.
 
-I built it for my own grid bot on Hyperliquid. Before it keeps buying dips, it checks macro plumbing and crypto leverage to see if something odd is going on. It's a rough heuristic: the weights are my own guesses and I haven't backtested any of it. Please don't treat it as a trading signal.
+I built the macro report for my own grid bot on Hyperliquid. Before it keeps buying dips, it checks macro plumbing and crypto leverage to see if something odd is going on. It's a rough heuristic: the weights are my own guesses and I haven't backtested any of it. Please don't treat it as a trading signal.
 
-- Dashboard: https://open-market-weather.hartmut-nese.workers.dev
-- JSON: https://open-market-weather.hartmut-nese.workers.dev/weather.json
-- Plain text: `curl -sL https://open-market-weather.hartmut-nese.workers.dev/weather.txt`
+- Dashboard: https://omw.hartmut-nese.workers.dev
+- Macro JSON: https://omw.hartmut-nese.workers.dev/weather.json
+- Plain text: `curl -sL https://omw.hartmut-nese.workers.dev/weather.txt`
+- Stock Fragility API: `https://omw.hartmut-nese.workers.dev/api/fragility?symbol=SPCX&offer=135`
 
+[![Market Weather](https://omw.hartmut-nese.workers.dev/badge.svg)](https://omw.hartmut-nese.workers.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## Why a weather report instead of charts?
@@ -16,7 +18,7 @@ RSI, moving averages and Bollinger bands only show what price has already done. 
 
 I'm not trying to predict prices. It's like checking for an umbrella before leaving the house: I just want to know whether the market is calm enough for a grid to work, or whether a storm is coming that will run over my resting bids.
 
-## What goes into the score
+## What goes into the macro score
 
 | Pillar | Weight | What it looks at | Source |
 | :--- | :--- | :--- | :--- |
@@ -30,6 +32,28 @@ I'm not trying to predict prices. It's like checking for an umbrella before leav
 Each pillar is mapped to 0–100 with simple clamped scaling. VIX, for example, runs from 12 to 35, and BTC funding is only scored by how far it sits from Hyperliquid's baseline of about 11% APR. The six pillars are combined using the weights above. No model, no fitting. Below 25 is clear, below 50 scattered clouds, below 75 rain, above that a storm.
 
 The daily FINRA file is around 15 MB, so the script streams it line by line instead of loading it into memory.
+
+## Single-Stock Fragility Check (`worker.js`)
+
+The dashboard includes an input field backed by a dependency-free Cloudflare Worker (`GET /api/fragility?symbol=...&offer=...`). It computes a 0–100 fragility index (`stable` < 30, `elevated` 30–54, `fragile` >= 55) from price and volume data:
+
+| Factor | Weight | What it measures |
+| :--- | :--- | :--- |
+| Volatility | 25% | 10-day realized volatility (or 20h intraday for young IPOs) and ratio vs. prior 60 days |
+| Upside Extension | 15% | Distance above the 50-day SMA and 20-day run-up (upside stretches only) |
+| Peak Drawdown | 15% | Distance below the window high (maxes out at 40%+) |
+| Overnight Gaps | 10% | Average absolute open-to-prior-close gap over the last 20 days |
+| Volume Spike | 10% | Last 2 days' volume vs. prior 20 days |
+| Liquidity | 10% | Average daily turnover (log-scaled between 1M and 50M in quote currency) |
+| History Depth | 15% | Penalty for short histories (0 at 120+ trading days) |
+| Offer Price Distance | 15% | Optional distance to an IPO offer or reference price (`&offer=...`) |
+
+When an optional offer price is given, the available weights are normalized by their sum.
+
+- **Recent IPOs:** When daily candles have fewer than 5 trading days, the Worker falls back to 1-hour intraday candles (`interval=1h&range=5d`) and groups turnover by calendar day so newly listed stocks can be checked from Day 1.
+- **Descriptive `regime` state:** Because both a blow-off top and an already completed crash produce high fragility scores, the Worker adds a neutral state label (`Overextended to the upside`, `Pullback after overextension`, `Significant drawdown from peak`, or `Balanced / neutral`) without issuing buy or sell signals.
+- **International stocks:** Append Yahoo exchange suffixes for non-US listings (for example `RHM.DE` for XETRA or `VOD.L` for London).
+- **Data & caching:** Pulls from Yahoo Finance chart endpoints with Stooq daily CSV as a fallback. Results are cached at the Cloudflare edge for 5 minutes.
 
 ## Things to know before you trust it
 
@@ -46,12 +70,14 @@ The daily FINRA file is around 15 MB, so the script streams it line by line inst
 ## Run it
 
 ```bash
-git clone https://github.com/hartmutnese-stack/open-market-weather.git
-cd open-market-weather
+git clone https://github.com/hartmutnese-stack/OMW-detailed.git
+cd OMW-detailed
 python3 engine.py
 ```
 
-Python 3.8+, standard library only. It writes `index.html`, `weather.json`, `weather.txt` and `badge.svg` into the current folder and appends a row to `history.csv`. Each file is written to a temp file first and then renamed, and `weather.json` goes last, so nobody reads a half-written file. If something unexpected goes wrong, the run stops and the old files stay where they are. I run it hourly via GitHub Actions and serve the files from Cloudflare for free. `history.csv` only keeps growing if your workflow commits it back to the repo.
+`engine.py` uses Python 3.8+ (standard library only). It writes `index.html`, `weather.json`, `weather.txt` and `badge.svg` into the current folder and appends a row to `history.csv`. Each file is written to a temp file first and then renamed, and `weather.json` goes last, so nobody reads a half-written file. If something unexpected goes wrong, the run stops and the old files stay where they are.
+
+I run it every 17 minutes via GitHub Actions (committing outputs and `history.csv` back to the repo) and serve the whole bundle via Cloudflare Workers with Static Assets (`worker.js`, `wrangler.jsonc`, `.assetsignore`). Hosting purely on static services like GitHub Pages works for the macro weather files, but `/api/fragility` requires the Cloudflare Worker proxy to avoid browser CORS blocks.
 
 Optional environment variables:
 
@@ -124,7 +150,7 @@ Here is how my bot reads it. If the request fails, it carries on:
 import aiohttp
 
 async def check_macro_circuit_breaker():
-    url = "https://open-market-weather.hartmut-nese.workers.dev/weather.json"
+    url = "https://omw.hartmut-nese.workers.dev/weather.json"
     timeout = aiohttp.ClientTimeout(total=2.0)
     try:
         async with aiohttp.ClientSession(timeout=timeout) as session:
@@ -150,6 +176,10 @@ if datetime.now(timezone.utc) > valid_until:
 ```
 
 The other entries in `tactical_posture` (dip buying, crypto perps, short volume, collateral) are plain status labels. Their `status` values can change between versions, so don't hard-code too much around them. The `action` texts are free text that I reword now and then, so read `status` and don't parse them.
+
+## Disclaimer
+
+This is a hobby project that reads public data. Nothing here is investment advice, a trading signal, or an offer of any kind. The numbers can be delayed, heuristic, or wrong — use at your own risk.
 
 ## Contributing
 
