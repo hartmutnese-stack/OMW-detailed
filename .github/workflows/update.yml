@@ -2,7 +2,7 @@ name: Update Market Weather
 
 on:
   schedule:
-    - cron: '*/17 * * * *'
+    - cron: '*/11 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -23,13 +23,15 @@ jobs:
           python-version: '3.11'
 
       - name: Skript ausführen
+        env:
+          OMW_BASE_URL: "https://omw.hartmut-nese.workers.dev"
+          OMW_REPO_URL: "https://github.com/hartmutnese-stack/OMW-detailed"
         run: python engine.py
 
       - name: Änderungen speichern und pushen
         run: |
           git config --global user.name "MarketWeatherBot"
           git config --global user.email "bot@marktwetter.org"
-          # WICHTIG: history.csv hier mit aufnehmen:
           git add index.html weather.json weather.txt badge.svg history.csv
           if ! git diff --staged --quiet; then
             git commit -m "Auto-Update: Market weather updated"
