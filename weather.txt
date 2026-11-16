@@ -1,7 +1,7 @@
 
 ======================================================================
  OPEN MARKET WEATHER OBSERVATORY // HYBRID MACRO & CRYPTO // v3.6.5
- 2026-11-16 22:01 UTC // COMPLETE // VALID UNTIL 2026-11-17T00:31:10Z
+ 2026-11-16 22:15 UTC // COMPLETE // VALID UNTIL 2026-11-17T00:45:35Z
 ======================================================================
 
  SCOPE: Experimental rule-based macro regime observer.
@@ -20,11 +20,11 @@
 
  --- 6 PILLARS ---
  [1] Market Volatility : Score 43/100 (VIX: 22.91 | MOVE: 101.28)
- [2] Crypto Leverage   : Score 6/100 (Funding: +11.0% APR | DVOL: 43.2%)
+ [2] Crypto Leverage   : Score 6/100 (Funding: +11.0% APR | DVOL: 43.4%)
  [3] Short Volume      : Score 0/100 (Short ratio: 44.0% (20261113))
  [4] Dollar Liquidity  : Score 14/100 (TGA: $924.6B | Swaps: $0.0B)
  [5] Credit Stress     : Score 58/100 (Filings: 20)
- [6] Odds and Ends     : Score 0/100 (Wiki Z: +0.03σ | Border: 0m)
+ [6] Odds and Ends     : Score 0/100 (Wiki Z: +0.03σ | Border: 5m)
 
  API: curl -sL https://omw.hartmut-nese.workers.dev/weather.json
  REPO: https://github.com/hartmutnese-stack/OMW-detailed
