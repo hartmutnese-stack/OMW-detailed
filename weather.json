@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
   "version": "3.6.5",
-  "timestamp": "2026-11-16 18:15 UTC",
-  "generated_at": "2026-11-16T18:15:43Z",
-  "valid_until": "2026-11-16T20:45:43Z",
+  "timestamp": "2026-11-16 18:30 UTC",
+  "generated_at": "2026-11-16T18:30:53Z",
+  "valid_until": "2026-11-16T21:00:53Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 3.21,
+  "run_duration_seconds": 5.64,
   "symbol": "☀️",
   "composite_score": 18,
-  "composite_raw": 18.15,
+  "composite_raw": 18.35,
   "display_score": 18,
   "status": "CLEAR SKIES",
   "desc": "Systemic friction minimal. Normal market conditions across macro and crypto feeds.",
@@ -74,7 +74,7 @@
     "grid_bots": {
       "status": "CAUTION",
       "color": "#ffcc00",
-      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 22.10 >= 20).",
+      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 22.26 >= 20).",
       "hysteresis": false,
       "confirmed_runs": 0
     },
@@ -101,9 +101,9 @@
   },
   "pillars": {
     "market_volatility": {
-      "score": 39,
-      "vix": 22.1,
-      "move_index": 99.19,
+      "score": 40,
+      "vix": 22.26,
+      "move_index": 99.13,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
@@ -111,7 +111,7 @@
     "crypto_leverage": {
       "score": 5,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2361.0,
+      "btc_oi_mil": 2361.4,
       "dvol_index": 43.0,
       "fallback": false,
       "hl_fallback": false,
@@ -150,9 +150,9 @@
       "cbp_fallback": false
     },
     "market_implied": {
-      "score": 39,
-      "vix": 22.1,
-      "move_index": 99.19,
+      "score": 40,
+      "vix": 22.26,
+      "move_index": 99.13,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
@@ -160,7 +160,7 @@
     "crypto_247": {
       "score": 5,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2361.0,
+      "btc_oi_mil": 2361.4,
       "dvol_index": 43.0,
       "fallback": false,
       "hl_fallback": false,
