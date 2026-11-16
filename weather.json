@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.6.5",
-  "timestamp": "2026-11-16 23:30 UTC",
-  "generated_at": "2026-11-16T23:30:49Z",
-  "valid_until": "2026-11-17T02:00:49Z",
+  "timestamp": "2026-11-16 23:45 UTC",
+  "generated_at": "2026-11-16T23:45:42Z",
+  "valid_until": "2026-11-17T02:15:42Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 3.32,
+  "run_duration_seconds": 3.49,
   "symbol": "⛅",
-  "composite_score": 27,
-  "composite_raw": 27.1,
-  "display_score": 27,
+  "composite_score": 28,
+  "composite_raw": 28.65,
+  "display_score": 28,
   "status": "SCATTERED CLOUDS",
   "desc": "Operational noise within standard ranges. No immediate systemic fracture.",
   "color": "#ffcc00",
@@ -109,10 +109,10 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 5,
+      "score": 6,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2512.7,
-      "dvol_index": 43.0,
+      "btc_oi_mil": 2403.7,
+      "dvol_index": 43.2,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -134,8 +134,8 @@
       "swaps_fallback": false
     },
     "credit_stress": {
-      "score": 49,
-      "sec_8k_filings": 18,
+      "score": 58,
+      "sec_8k_filings": 20,
       "sec_8k_item_204": 6,
       "fallback": false
     },
@@ -158,10 +158,10 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 5,
+      "score": 6,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2512.7,
-      "dvol_index": 43.0,
+      "btc_oi_mil": 2403.7,
+      "dvol_index": 43.2,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -183,8 +183,8 @@
       "swaps_fallback": false
     },
     "credit_statutory": {
-      "score": 49,
-      "sec_8k_filings": 18,
+      "score": 58,
+      "sec_8k_filings": 20,
       "sec_8k_item_204": 6,
       "fallback": false
     },
