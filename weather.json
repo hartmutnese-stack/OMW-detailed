@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.6.5",
-  "timestamp": "2026-11-16 20:45 UTC",
-  "generated_at": "2026-11-16T20:45:34Z",
-  "valid_until": "2026-11-16T23:15:34Z",
+  "timestamp": "2026-11-16 21:00 UTC",
+  "generated_at": "2026-11-16T21:00:59Z",
+  "valid_until": "2026-11-16T23:30:59Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 2.85,
+  "run_duration_seconds": 5.31,
   "symbol": "☀️",
-  "composite_score": 18,
-  "composite_raw": 18.6,
-  "display_score": 18,
+  "composite_score": 21,
+  "composite_raw": 21.7,
+  "display_score": 21,
   "status": "CLEAR SKIES",
   "desc": "Systemic friction minimal. Normal market conditions across macro and crypto feeds.",
   "color": "#00ff66",
@@ -74,7 +74,7 @@
     "grid_bots": {
       "status": "CAUTION",
       "color": "#ffcc00",
-      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 23.70 >= 20).",
+      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 23.93 >= 20).",
       "hysteresis": false,
       "confirmed_runs": 0
     },
@@ -86,7 +86,7 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Neutral baseline funding (+9.5% APR)."
+      "action": "Neutral baseline funding (+8.6% APR)."
     },
     "dark_pool": {
       "status": "NOMINAL",
@@ -101,17 +101,17 @@
   },
   "pillars": {
     "market_volatility": {
-      "score": 44,
-      "vix": 23.7,
-      "move_index": 101.28,
+      "score": 45,
+      "vix": 23.93,
+      "move_index": 101.31,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
     },
     "crypto_leverage": {
       "score": 6,
-      "btc_funding_apr": 9.5,
-      "btc_oi_mil": 2450.7,
+      "btc_funding_apr": 8.6,
+      "btc_oi_mil": 2430.1,
       "dvol_index": 43.0,
       "fallback": false,
       "hl_fallback": false,
@@ -124,9 +124,9 @@
       "fallback": false
     },
     "dollar_liquidity": {
-      "score": 10,
-      "tga_billions": 933.1,
-      "tga_5d_flow": 10.4,
+      "score": 14,
+      "tga_billions": 924.6,
+      "tga_5d_flow": 14.3,
       "tga_flow_days": 7,
       "swaps_billions": 0.0,
       "fallback": false,
@@ -134,9 +134,9 @@
       "swaps_fallback": false
     },
     "credit_stress": {
-      "score": 44,
-      "sec_8k_filings": 17,
-      "sec_8k_item_204": 5,
+      "score": 58,
+      "sec_8k_filings": 20,
+      "sec_8k_item_204": 6,
       "fallback": false
     },
     "odds_and_ends": {
@@ -150,17 +150,17 @@
       "cbp_fallback": false
     },
     "market_implied": {
-      "score": 44,
-      "vix": 23.7,
-      "move_index": 101.28,
+      "score": 45,
+      "vix": 23.93,
+      "move_index": 101.31,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
     },
     "crypto_247": {
       "score": 6,
-      "btc_funding_apr": 9.5,
-      "btc_oi_mil": 2450.7,
+      "btc_funding_apr": 8.6,
+      "btc_oi_mil": 2430.1,
       "dvol_index": 43.0,
       "fallback": false,
       "hl_fallback": false,
@@ -173,9 +173,9 @@
       "fallback": false
     },
     "liquidity_plumbing": {
-      "score": 10,
-      "tga_billions": 933.1,
-      "tga_5d_flow": 10.4,
+      "score": 14,
+      "tga_billions": 924.6,
+      "tga_5d_flow": 14.3,
       "tga_flow_days": 7,
       "swaps_billions": 0.0,
       "fallback": false,
@@ -183,9 +183,9 @@
       "swaps_fallback": false
     },
     "credit_statutory": {
-      "score": 44,
-      "sec_8k_filings": 17,
-      "sec_8k_item_204": 5,
+      "score": 58,
+      "sec_8k_filings": 20,
+      "sec_8k_item_204": 6,
       "fallback": false
     },
     "cognitive_physical": {
