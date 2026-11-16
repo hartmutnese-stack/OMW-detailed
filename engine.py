@@ -53,10 +53,10 @@ def env_number(name, default, cast=float, minimum=None):
 VERSION = "3.6.5"
 SCHEMA_VERSION = 1
 BASE_URL = os.environ.get(
-    "OMW_BASE_URL", "https://open-market-weather.hartmut-nese.workers.dev"
+    "OMW_BASE_URL", "https://omw.hartmut-nese.workers.dev"
 ).rstrip("/")
 REPO_URL = os.environ.get(
-    "OMW_REPO_URL", "https://github.com/hartmutnese-stack/open-market-weather"
+    "OMW_REPO_URL", "https://github.com/hartmutnese-stack/OMW-detailed"
 )
 CONTACT = os.environ.get("OMW_CONTACT", "admin@marktwetter.org")
 VALID_FOR_HOURS = env_number("OMW_VALID_FOR_HOURS", 2.5, float, 0.1)
@@ -82,7 +82,8 @@ GRID_COLORS = {"ACTIVE": "#00ff66", "CAUTION": "#ffcc00", "PAUSED": "#ff0033"}
 _cold = os.environ.get("OMW_COLD_START_STATUS", "CAUTION").strip().upper()
 COLD_START_STATUS = _cold if _cold in GRID_SEVERITY else "CAUTION"
 
-MAX_AGE_DAYS = {"yahoo": 5, "finra": 4, "tga": 6}
+# Allow 5 days for FINRA to cover 3-day US holiday weekends plus UTC rollover
+MAX_AGE_DAYS = {"yahoo": 5, "finra": 5, "tga": 6}
 
 WIKI_MIN_BASELINE_AVG = 20.0
 WIKI_MIN_BASELINE_DAYS = 18
@@ -258,16 +259,21 @@ def yahoo_last_price(ticker):
 def get_market_volatility(feed_health):
     vix, vix_err, vix_age = yahoo_last_price("%5EVIX")
     move, move_err, move_age = yahoo_last_price("%5EMOVE")
-    fallback = vix is None or move is None
-    if vix is None:
+    # Track per-quote fallbacks separately so history.csv keeps valid values on partial outages
+    vix_fallback = vix is None
+    move_fallback = move is None
+    fallback = vix_fallback or move_fallback
+    if vix_fallback:
         vix = 16.5
-    if move is None:
+    if move_fallback:
         move = 95.0
 
     ages = [a for a in (vix_age, move_age) if a is not None]
     oldest = max(ages) if ages else None
     if fallback:
-        feed_health["yahoo"] = health("FALLBACK", vix_err or move_err)
+        missing = [name for name, flag in (("VIX", vix_fallback), ("MOVE", move_fallback)) if flag]
+        detail = f"partial fallback ({', '.join(missing)})" if len(missing) == 1 else None
+        feed_health["yahoo"] = health("FALLBACK", vix_err or move_err, detail)
     elif oldest is not None and oldest > MAX_AGE_DAYS["yahoo"]:
         feed_health["yahoo"] = health("STALE", None, f"oldest quote is {oldest:.1f} days old")
     else:
@@ -280,6 +286,8 @@ def get_market_volatility(feed_health):
         "vix": round(vix, 2),
         "move_index": round(move, 2),
         "fallback": fallback,
+        "vix_fallback": vix_fallback,
+        "move_fallback": move_fallback,
     }
 
 
@@ -376,7 +384,8 @@ def finra_spy_ratio(date_str):
 def get_short_volume(feed_health):
     today = utc_now()
     consecutive_errors = 0
-    for i in range(7):
+    # Check up to 7 days back so holiday weekends still resolve cleanly
+    for i in range(8):
         day = today - timedelta(days=i)
         date_str = day.strftime("%Y%m%d")
         ratio, state = finra_spy_ratio(date_str)
@@ -422,8 +431,9 @@ def get_dollar_liquidity(feed_health):
     rows = dig(tr.data, "data", default=[]) if tr.ok else []
     if not isinstance(rows, list):
         rows = []
-    values = []
-    latest_date = None
+
+    seen_dates = set()
+    entries = []
     for row in rows:
         if not isinstance(row, dict):
             continue
@@ -432,17 +442,32 @@ def get_dollar_liquidity(feed_health):
             val = to_float(row.get("close_today_bal"))
         if val is None:
             continue
-        if not values:
-            latest_date = parse_date(row.get("record_date"))
-        values.append(val)
+        rec_date = parse_date(row.get("record_date"))
+        # Deduplicate repeated dates before computing the multi-day balance delta
+        if rec_date is not None:
+            if rec_date in seen_dates:
+                continue
+            seen_dates.add(rec_date)
+        entries.append((rec_date, val))
+
+    # Ensure descending date order when record_date is available on all rows
+    if entries and all(d is not None for d, _ in entries):
+        entries.sort(key=lambda item: item[0], reverse=True)
 
     tga_bal, tga_change, tga_score, tga_fallback = 850.0, 0.0, 15, True
-    if len(values) >= 2:
-        latest, prev = values[0], values[min(4, len(values) - 1)]
-        tga_bal = latest / 1000.0
-        tga_change = (latest - prev) / 1000.0
-        tga_score = clamp(int(abs(tga_change) * 1.5))
-        tga_fallback = False
+    latest_date = entries[0][0] if entries else None
+    tga_flow_days = None
+    if len(entries) >= 2:
+        latest_date, latest = entries[0]
+        prev_date, prev = entries[min(4, len(entries) - 1)]
+        # Guard against zero-day flow if dates were missing/identical
+        if latest_date is None or prev_date is None or latest_date != prev_date:
+            tga_bal = latest / 1000.0
+            tga_change = (latest - prev) / 1000.0
+            tga_score = clamp(int(abs(tga_change) * 1.5))
+            tga_fallback = False
+            if latest_date is not None and prev_date is not None:
+                tga_flow_days = (latest_date - prev_date).days
 
     if tga_fallback:
         feed_health["tga"] = health("FALLBACK", tr.error_type or "INVALID_RESPONSE")
@@ -472,6 +497,7 @@ def get_dollar_liquidity(feed_health):
         "score": int(tga_score * 0.7 + swap_score * 0.3),
         "tga_billions": round(tga_bal, 1),
         "tga_5d_flow": round(tga_change, 1),
+        "tga_flow_days": tga_flow_days,
         "swaps_billions": round(swap_b, 2),
         "fallback": tga_fallback or swaps_fallback,
         "tga_fallback": tga_fallback,
@@ -484,6 +510,26 @@ def get_dollar_liquidity(feed_health):
 # ==============================================================================
 def credit_score_from_count(count):
     return clamp(int((count - 6.8) * 4.4), 5, 100)
+
+
+def count_confirmed_item_204(hits):
+    """Count unique 8-K filings in the first page whose metadata explicitly lists Item 2.04."""
+    if not isinstance(hits, list):
+        return None
+    adsh_seen = set()
+    for hit in hits:
+        if not isinstance(hit, dict):
+            continue
+        src = hit.get("_source")
+        if not isinstance(src, dict):
+            continue
+        items = src.get("items")
+        if not isinstance(items, list) or "2.04" not in items:
+            continue
+        adsh = src.get("adsh") or str(hit.get("_id", "")).split(":", 1)[0]
+        if adsh:
+            adsh_seen.add(adsh)
+    return len(adsh_seen)
 
 
 def get_credit_stress(feed_health):
@@ -500,6 +546,8 @@ def get_credit_stress(feed_health):
         total = total.get("value")
     valid = isinstance(total, int) and not isinstance(total, bool)
     count = total if valid else 11
+    # Keep full-text hit total for scoring calibration, but expose confirmed Item 2.04 filings for diagnostics
+    confirmed_204 = count_confirmed_item_204(dig(result.data, "hits", "hits")) if valid else None
     feed_health["sec"] = health(
         "OK" if valid else "FALLBACK",
         None if valid else (result.error_type or "INVALID_RESPONSE"),
@@ -507,6 +555,7 @@ def get_credit_stress(feed_health):
     return {
         "score": credit_score_from_count(count),
         "sec_8k_filings": count,
+        "sec_8k_item_204": confirmed_204,
         "fallback": not valid,
     }
 
@@ -591,9 +640,10 @@ def laredo_truck_wait():
         for lane_key in ("standard_lanes", "FAST_lanes", "lanes"):
             lane = comm.get(lane_key)
             if isinstance(lane, dict):
-                delay = lane.get("delay_minutes")
-                if delay is not None and str(delay).strip().isdigit():
-                    delays.append(int(delay))
+                # Parse numerically so values like "0.0" are accepted while "N/A" is ignored
+                delay_val = to_float(lane.get("delay_minutes"))
+                if delay_val is not None and delay_val >= 0:
+                    delays.append(int(round(delay_val)))
     error = None if found_laredo else "NO_LAREDO_ENTRY"
     return (max(delays) if delays else None), found_laredo, error
 
@@ -758,14 +808,15 @@ def resolve_grid_status(candidate, prev_status, prev_transition):
                       "recovery_target": target, "status_changed": False}
 
 
-def return_band_blockers(composite, vix, crypto_score):
+def calm_blockers(composite, vix, crypto_score, band):
+    """Return human-readable reasons preventing an ACTIVE status under the given band."""
     blockers = []
-    if composite >= CALM_RETURN["composite"]:
-        blockers.append(f"overall {composite:.1f} >= {CALM_RETURN['composite']:g}")
-    if vix >= CALM_RETURN["vix"]:
-        blockers.append(f"VIX {vix:.2f} >= {CALM_RETURN['vix']:g}")
-    if crypto_score >= CALM_RETURN["crypto"]:
-        blockers.append(f"crypto {crypto_score} >= {CALM_RETURN['crypto']:g}")
+    if composite >= band["composite"]:
+        blockers.append(f"overall {composite:.1f} >= {band['composite']:g}")
+    if vix >= band["vix"]:
+        blockers.append(f"VIX {vix:.2f} >= {band['vix']:g}")
+    if crypto_score >= band["crypto"]:
+        blockers.append(f"crypto {crypto_score} >= {band['crypto']:g}")
     return blockers
 
 
@@ -842,7 +893,7 @@ def generate_tactical_posture(composite, p, quality, prev):
     elif frozen:
         action = f"{caution_ref}. Market feeds on fallback data, no step down on fallback data."
     elif band_held_calm:
-        reasons = return_band_blockers(composite, vix, crypto_score)
+        reasons = calm_blockers(composite, vix, crypto_score, CALM_RETURN)
         if not clean:
             reasons.append("upstream data quality is degraded")
         action = f"{caution_ref}. Return band active ({', '.join(reasons)})."
@@ -851,7 +902,10 @@ def generate_tactical_posture(composite, p, quality, prev):
     elif not clean:
         action = f"{caution_ref}. Upstream data quality is degraded."
     else:
-        action = f"{caution_ref}, smaller sizes or leverage."
+        # Include the entry-band trigger(s) when CAUTION is driven directly by metrics
+        reasons = calm_blockers(composite, vix, crypto_score, CALM_ENTER)
+        suffix = f" ({', '.join(reasons)})" if reasons else ""
+        action = f"{caution_ref}, smaller sizes or leverage{suffix}."
 
     posture["grid_bots"] = {
         "status": grid_status, "color": GRID_COLORS[grid_status], "action": action,
@@ -1015,7 +1069,7 @@ def history_row(data):
     dl, cs, oe = p["dollar_liquidity"], p["credit_stress"], p["odds_and_ends"]
     return [
         data["timestamp"], data["composite_raw"],
-        blank_if(mv, "fallback", "vix"), blank_if(mv, "fallback", "move_index"),
+        blank_if(mv, "vix_fallback", "vix"), blank_if(mv, "move_fallback", "move_index"),
         blank_if(cl, "hl_fallback", "btc_funding_apr"), blank_if(cl, "dvol_fallback", "dvol_index"),
         blank_if(sv, "fallback", "spy_short_volume_ratio"),
         blank_if(dl, "tga_fallback", "tga_billions"), blank_if(dl, "tga_fallback", "tga_5d_flow"),
@@ -1235,7 +1289,14 @@ FRAGILITY_WIDGET = """
         const o = offEl.value.trim();
         if (s) { location.hash = s + (o ? "," + o : ""); run(s, o); }
       });
-      const h = decodeURIComponent(location.hash.slice(1)).split(",");
+      // Guard against malformed percent-encoding in URL hashes
+      let rawHash = "";
+      try {
+        rawHash = decodeURIComponent(location.hash.slice(1));
+      } catch {
+        rawHash = "";
+      }
+      const h = rawHash.split(",");
       if (h[0] && /^[A-Za-z0-9.-]{1,15}$/.test(h[0])) {
         symEl.value = h[0].toUpperCase();
         if (h[1]) offEl.value = h[1];
