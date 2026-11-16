@@ -17,27 +17,7 @@ Changes in 3.6.5:
   - transition has two new fields: market_status and clean_runs. status_changed now
     refers to the published grid status. State written by older versions is read
     without trouble.
-
-Changes in 3.6.4:
-  - Wikipedia: a missing day is no longer always read as zero views. Whether an
-    article has enough traffic is decided on the series with gaps counted as zero.
-    For an article above that line a genuine zero day is practically impossible, so
-    its gaps are treated as gaps: the z-score is computed from the days that are
-    there, and the article is skipped when too many are missing. One missing day no
-    longer collapses the z-score of a busy article.
-  - Return-band text names data quality as well when both hold the status back.
-  - Posture wording: the action texts describe reference settings instead of giving
-    orders, and "Standard grid parameters" is now "No change to your usual grid
-    settings". Status values and JSON structure are unchanged.
-
-Changes in 3.6.3:
-  - Wikipedia: the series is aligned by calendar day instead of by list position, and
-    articles with too little traffic for a meaningful z-score are skipped with a log line.
-  - Cold start: when no recent state exists, the assumed status (OMW_COLD_START_STATUS)
-    now also decides which threshold band applies, not only the confirmation count.
-  - Return-band text names every condition that holds the status back.
-  - data_quality: fallback_count counts only fallback feeds, stale feeds have their
-    own stale_count.
+  - Integrated Single-Stock Fragility Check widget into index.html (/api/fragility).
 
 Optional environment variables:
   OMW_CONTACT                  Contact string for the User-Agent sent to SEC EDGAR and
@@ -592,16 +572,7 @@ WIKI_ARTICLES = [
 
 
 def wikipedia_zscore(article, start, end):
-    """Mean of the last 7 days against the 3+ weeks before. `start` and `end` are
-    dates. The series is built per calendar day. The API leaves out days it has no
-    data for, and how such a day is read depends on the traffic:
-
-    - The average over the window with missing days counted as zero decides whether
-      the article has enough traffic at all (WIKI_MIN_BASELINE_AVG). A quiet article
-      has many genuine zero days and is skipped.
-    - For an article above that line a genuine zero day is practically impossible,
-      so a missing day is a gap in the data. The statistics use the days that are
-      there, and the article is skipped when too many are missing."""
+    """Mean of the last 7 days against the 3+ weeks before."""
     url = (
         "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia.org/"
         f"all-access/user/{article}/daily/{start.strftime('%Y%m%d')}/{end.strftime('%Y%m%d')}"
@@ -628,7 +599,7 @@ def wikipedia_zscore(article, start, end):
         log("WARN", "WIKIPEDIA", f"{article}: window has only {n_days} days (needs 21)")
         return None
     series = [by_day.get((start + timedelta(days=i)).strftime("%Y%m%d"))
-              for i in range(n_days)]                     # None = no entry for that day
+              for i in range(n_days)]
     days_with_data = sum(1 for v in series if v is not None)
 
     baseline_all, recent_all = series[:-7], series[-7:]
@@ -729,7 +700,6 @@ def get_odds_and_ends(feed_health):
 # PREVIOUS STATE (for hysteresis)
 # ==============================================================================
 def parse_ts(value):
-    """Accepts '2026-01-01T12:00:00Z' and '2026-01-01 12:00 UTC'."""
     if not value or not isinstance(value, str):
         return None
     try:
@@ -751,7 +721,6 @@ def read_local_state():
 
 
 def previous_state():
-    """The last run's weather.json (local file first, then the live site)."""
     loaders = (
         read_local_state,
         lambda: fetch_json(f"{BASE_URL}/weather.json", "PREVIOUS_STATE", timeout=6, retries=0).data,
@@ -797,8 +766,6 @@ def data_quality(feed_health):
 # GRID STATUS (level bands + run-count confirmation)
 # ==============================================================================
 def raw_grid_candidate(composite, p, clean, band_status):
-    """What the grid status would be without confirmation delay.
-    band_status decides which threshold band applies."""
     vix = p["market_volatility"]["vix"]
     crypto = p["crypto_leverage"]["score"]
     pause_limit = PAUSE_STAY if band_status == "PAUSED" else PAUSE_ENTER
@@ -810,7 +777,6 @@ def raw_grid_candidate(composite, p, clean, band_status):
 
 
 def resolve_grid_status(candidate, prev_status, prev_transition):
-    """Apply confirmation to a raw candidate. Returns (status, transition)."""
     cold_start = prev_status is None
     previous = prev_status or COLD_START_STATUS
     required = RECOVERY_CONFIRMATIONS
@@ -845,7 +811,6 @@ def resolve_grid_status(candidate, prev_status, prev_transition):
 
 
 def return_band_blockers(composite, vix, crypto_score):
-    """Conditions that keep the status out of ACTIVE under the stricter return band."""
     blockers = []
     if composite >= CALM_RETURN["composite"]:
         blockers.append(f"overall {composite:.1f} >= {CALM_RETURN['composite']:g}")
@@ -866,23 +831,15 @@ def generate_tactical_posture(composite, p, quality, prev):
     svr = p["short_volume"]["spy_short_volume_ratio"]
     swaps = p["dollar_liquidity"]["swaps_billions"]
     clean = quality["status"] == "HIGH" and not quality["degraded_feeds"]
-    # The VIX and crypto feeds drive the thresholds. While one of them is on fallback
-    # its numbers are neutral defaults, so they must not be allowed to improve the status.
     market_inputs_ok = not (p["market_volatility"]["fallback"] or p["crypto_leverage"]["fallback"])
     required = RECOVERY_CONFIRMATIONS
     posture = {}
 
-    # 1. Grid bots.
-    # Two things are tracked separately. The market state is what the scores say
-    # (with its bands and confirmation). Data quality only decides whether ACTIVE may
-    # be shown: a feed problem shows ACTIVE as CAUTION, but it is not a market CAUTION
-    # and does not move the market state onto the stricter return band.
     prev_published = previous_grid_status(prev)
     prev_transition = dig(prev, "transition", default={})
     prev_market = dig(prev_transition, "market_status")
     if prev_market not in GRID_SEVERITY:
-        prev_market = prev_published            # state written by an older version
-    # Without a recent state the assumed cold-start status also picks the band.
+        prev_market = prev_published
     band_status = prev_market or COLD_START_STATUS
 
     calm_enter = composite < CALM_ENTER["composite"] and vix < CALM_ENTER["vix"] and crypto_score < CALM_ENTER["crypto"]
@@ -896,12 +853,11 @@ def generate_tactical_posture(composite, p, quality, prev):
     candidate = raw_grid_candidate(composite, p, True, band_status)
     frozen = False
     if not market_inputs_ok and GRID_SEVERITY[candidate] < GRID_SEVERITY[band_status]:
-        candidate, frozen = band_status, True   # no step down on fallback data
+        candidate, frozen = band_status, True
     market_status, transition = resolve_grid_status(candidate, prev_market, prev_transition)
 
     prev_clean = to_float(dig(prev_transition, "clean_runs"))
     if prev_clean is None:
-        # No counter yet: a fresh start or a state from an older version.
         prev_clean = required if (prev is None or not dig(prev, "data_quality", "degraded_feeds")) else 0
     clean_runs = int(min(required, prev_clean + 1)) if clean else 0
     data_hold = market_status == "ACTIVE" and clean_runs < required
@@ -954,13 +910,11 @@ def generate_tactical_posture(composite, p, quality, prev):
         "hysteresis": held, "confirmed_runs": transition["confirmed_runs"],
     }
 
-    # 2. Dip buying
     if composite < 45 and svr < 55.0 and crypto_score < 50 and clean:
         posture["dip_buying"] = {"status": "FAVORABLE", "color": "#00ff66", "action": "Orderly pullbacks. Liquidity supports absorption."}
     else:
         posture["dip_buying"] = {"status": "DEFENSIVE", "color": "#ff6600", "action": "Support looks fragile; falling-knife risk is elevated."}
 
-    # 3. Crypto perps
     apr = f"{funding:+.1f}%"
     if funding > 25.0:
         posture["crypto_perps"] = {"status": "OVERHEATED", "color": "#ff0033", "action": f"High perp funding ({apr} APR). Long squeeze risk."}
@@ -971,7 +925,6 @@ def generate_tactical_posture(composite, p, quality, prev):
     else:
         posture["crypto_perps"] = {"status": "NOMINAL", "color": "#00ff66", "action": f"Moderate derivatives bias ({apr} APR)."}
 
-    # 4. Short volume
     if svr < 52.0:
         posture["dark_pool"] = {"status": "NOMINAL", "color": "#00ff66", "action": f"Normal short volume share on SPY ({svr}%)."}
     elif svr < 59.0:
@@ -979,7 +932,6 @@ def generate_tactical_posture(composite, p, quality, prev):
     else:
         posture["dark_pool"] = {"status": "HIGH", "color": "#ff0033", "action": f"High short volume share on SPY ({svr}%)."}
 
-    # 5. Central bank swap lines
     if swaps >= SWAP_NOISE_B:
         posture["collateral"] = {"status": "FRICTION DETECTED", "color": "#ff0033", "action": f"Central bank swap operations: ${swaps}B."}
     elif composite >= 50:
@@ -1063,7 +1015,7 @@ def calculate_systemic_weather():
 # EXPORT
 # ==============================================================================
 def fb_tag(pillar_key, pillar, feed_health):
-    """'fallback: tga, ny fed; stale: yahoo' or ''."""
+    # Generates tag like "fallback: tga, ny fed; stale: yahoo" or ""
     parts = FALLBACK_PARTS[pillar_key]
     fallback = [feed.replace("_", " ") for flag, feed in parts if pillar.get(flag)]
     stale = [feed.replace("_", " ") for _, feed in parts
@@ -1105,7 +1057,6 @@ def pillar_rows(p, feed_health):
 
 
 def blank_if(pillar, flag, field):
-    """Value for the history CSV, empty when that feed was on fallback data."""
     value = pillar[field]
     return "" if pillar.get(flag) or value is None else value
 
@@ -1127,7 +1078,6 @@ def history_row(data):
 
 
 def append_history(data):
-    """Append raw values to history.csv for later percentile calibration."""
     exists = os.path.exists(HISTORY_FILE) and os.path.getsize(HISTORY_FILE) > 0
     rows_before = 0
     if exists:
@@ -1251,6 +1201,102 @@ HTML_CSS = """
         }
 """
 
+FRAGILITY_WIDGET = """
+    <h3 style="margin-top:2.5rem;">SINGLE-STOCK FRAGILITY CHECK</h3>
+    <div class="posture-card">
+        <div class="badge-sub" style="margin-bottom:0.8rem;">
+            Misst den Marktzustand einer Aktie aus Kurs- und Volumendaten (ohne Richtung, kein Handelssignal).
+        </div>
+        <form id="frag-form" style="display:flex;flex-wrap:wrap;gap:0.6rem;margin-bottom:1rem;">
+            <input id="frag-sym" placeholder="Kürzel, z. B. SPCX, ANT" maxlength="10" autocomplete="off" required
+                   style="background:#090b0e;color:#e2e8f0;border:1px solid #2d3748;border-radius:4px;padding:0.55rem 0.7rem;font:inherit;text-transform:uppercase;width:13.5rem;">
+            <input id="frag-off" placeholder="Ausgabepreis (opt., z. B. 135)" inputmode="decimal" autocomplete="off"
+                   style="background:#090b0e;color:#e2e8f0;border:1px solid #2d3748;border-radius:4px;padding:0.55rem 0.7rem;font:inherit;width:15rem;">
+            <button type="submit"
+                    style="background:#1a202c;color:#63b3ed;border:1px solid #2d3748;border-radius:4px;padding:0.55rem 1.1rem;font:inherit;cursor:pointer;">
+                Prüfen
+            </button>
+        </form>
+        <div id="frag-out"></div>
+        <details style="font-size:0.78rem;color:#718096;margin-top:0.8rem;">
+            <summary style="cursor:pointer;">So wird gerechnet</summary>
+            <p style="margin-top:0.4rem;">Acht Faktoren (0–100, höher = fragiler): Schwankung 25 %, Überdehnung 15 %, Rückgang vom Hoch 15 %, Kurslücken 10 %, Handelsvolumen 10 %, Handelbarkeit 10 %, Länge der Historie 15 %, Abstand zum Ausgabepreis 15 % (optional). Bei jungen Börsengängen (&lt; 5 Handelstage) automatischer Fallback auf 1h-Intraday-Daten.</p>
+        </details>
+    </div>
+    <script>
+    (() => {
+      const out = document.getElementById("frag-out");
+      const form = document.getElementById("frag-form");
+      const symEl = document.getElementById("frag-sym");
+      const offEl = document.getElementById("frag-off");
+      const colors = { stabil: "#00ff66", erhoeht: "#ffcc00", fragil: "#ff6600" };
+      const el = (tag, text, style) => {
+        const e = document.createElement(tag);
+        if (text !== undefined) e.textContent = text;
+        if (style) e.style.cssText = style;
+        return e;
+      };
+      function render(d) {
+        out.replaceChildren();
+        const col = colors[d.labelClass] || "#d1d5db";
+        out.append(el("div", `${d.symbol} · ${d.name}${d.exchange ? " · " + d.exchange : ""} · Kurs: ${d.price} ${d.currency || ""} · Stand ${d.asOf} (${d.source})`, "color:#718096;font-size:0.8rem;margin-bottom:0.6rem;"));
+        const head = el("div", "", "display:flex;flex-wrap:wrap;align-items:baseline;gap:0.9rem;margin-bottom:0.8rem;");
+        head.append(
+          el("span", String(d.score), `font-size:2.3rem;font-weight:bold;line-height:1;color:${col};`),
+          el("span", d.label.toUpperCase(), `font-weight:bold;color:${col};`),
+          el("span", `Lage: ${d.regime}`, "color:#e2e8f0;font-size:0.85rem;"),
+          el("span", `Datenlage: ${d.quality} (${d.tradingDays} Tage)`, "color:#718096;font-size:0.8rem;")
+        );
+        out.append(head);
+        for (const f of d.factors) {
+          const wrap = el("div", "", "border-top:1px solid #161b22;padding:0.45rem 0;");
+          const row = el("div", "", "display:flex;justify-content:space-between;gap:0.8rem;font-size:0.85rem;");
+          const mid = el("span", f.valueText, "color:#a0aec0;flex:1;");
+          mid.title = f.explain;
+          row.append(
+            el("strong", f.label, "min-width:11.5rem;color:#cbd5e0;"),
+            mid,
+            el("span", f.score === null ? "n/a" : String(f.score), "background:#1a202c;border-radius:3px;padding:1px 8px;font-weight:bold;white-space:nowrap;")
+          );
+          wrap.append(row);
+          if (f.score !== null) {
+            const bar = el("div", "", "height:4px;background:#1a202c;border-radius:2px;margin-top:0.35rem;");
+            bar.append(el("div", "", `height:4px;background:#63b3ed;border-radius:2px;width:${Math.max(2, f.score)}%;`));
+            wrap.append(bar);
+          }
+          out.append(wrap);
+        }
+        for (const n of d.notes) out.append(el("div", n, "color:#718096;font-size:0.78rem;margin-top:0.4rem;"));
+      }
+      async function run(symbol, offer) {
+        out.replaceChildren(el("div", "Lade Kursdaten ...", "color:#a0aec0;font-size:0.85rem;"));
+        const q = new URLSearchParams({ symbol });
+        if (offer) q.set("offer", offer);
+        try {
+          const res = await fetch("/api/fragility?" + q);
+          const d = await res.json();
+          if (!res.ok) { out.replaceChildren(el("div", d.message || "Fehler", "color:#ff6600;font-size:0.85rem;")); return; }
+          render(d);
+        } catch {
+          out.replaceChildren(el("div", "API-Abruf fehlgeschlagen.", "color:#ff6600;font-size:0.85rem;"));
+        }
+      }
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const s = symEl.value.trim().toUpperCase();
+        const o = offEl.value.trim();
+        if (s) { location.hash = s + (o ? "," + o : ""); run(s, o); }
+      });
+      const h = decodeURIComponent(location.hash.slice(1)).split(",");
+      if (h[0] && /^[A-Za-z0-9.\\-]{1,10}$/.test(h[0])) {
+        symEl.value = h[0].toUpperCase();
+        if (h[1]) offEl.value = h[1];
+        run(h[0].toUpperCase(), h[1] || "");
+      }
+    })();
+    </script>
+"""
+
 
 def fb_html(fb):
     return f'<span class="tag-fallback">[{html_lib.escape(fb)}]</span>' if fb else ""
@@ -1332,7 +1378,7 @@ def render_html(data, rows):
             </tbody>
         </table>
     </div>
-
+    {FRAGILITY_WIDGET}
     <div class="footer">
         Open market metrics. Built with Python stdlib on Cloudflare and GitHub Actions.<br>
         STRICTLY INFORMATIONAL &amp; EXPERIMENTAL. No investment advice, trade signals, or commercial solicitation. All metrics are heuristic, derived, and subject to latency.<br>
