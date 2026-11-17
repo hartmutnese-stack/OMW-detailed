@@ -2,7 +2,15 @@
 # -*- coding: utf-8 -*-
 """
 OPEN MARKET WEATHER OBSERVATORY // HYBRID MACRO & CRYPTO
-Version: 3.6.5 (stdlib only)
+Version: 3.6.6 (stdlib only)
+
+Changes in 3.6.6:
+  - Fragility widget: a decimal comma in the offer price ("12,5") is turned into a
+    point before it goes into the URL hash. The hash uses a comma as separator, so
+    "SPCX,12,5" used to be read as offer 12. The offer is also checked as a number,
+    and links made before this version are read correctly too.
+  - SEC: sec_8k_item_204 counts only the first result page, so the new field
+    sec_8k_item_204_complete says whether that page held all hits.
 """
 
 import csv
@@ -50,7 +58,7 @@ def env_number(name, default, cast=float, minimum=None):
     return value
 
 
-VERSION = "3.6.5"
+VERSION = "3.6.6"
 SCHEMA_VERSION = 1
 BASE_URL = os.environ.get(
     "OMW_BASE_URL", "https://omw.hartmut-nese.workers.dev"
@@ -546,8 +554,11 @@ def get_credit_stress(feed_health):
         total = total.get("value")
     valid = isinstance(total, int) and not isinstance(total, bool)
     count = total if valid else 11
-    # Keep full-text hit total for scoring calibration, but expose confirmed Item 2.04 filings for diagnostics
-    confirmed_204 = count_confirmed_item_204(dig(result.data, "hits", "hits")) if valid else None
+    # The score uses the full-text hit total. The confirmed count is a diagnostic and only
+    # covers the first result page, so it says whether that page held all hits.
+    hits = dig(result.data, "hits", "hits") if valid else None
+    confirmed_204 = count_confirmed_item_204(hits) if valid else None
+    page_complete = bool(valid and isinstance(hits, list) and len(hits) >= count)
     feed_health["sec"] = health(
         "OK" if valid else "FALLBACK",
         None if valid else (result.error_type or "INVALID_RESPONSE"),
@@ -556,6 +567,7 @@ def get_credit_stress(feed_health):
         "score": credit_score_from_count(count),
         "sec_8k_filings": count,
         "sec_8k_item_204": confirmed_204,
+        "sec_8k_item_204_complete": page_complete,
         "fallback": not valid,
     }
 
@@ -1238,6 +1250,9 @@ FRAGILITY_WIDGET = """
         if (style) e.style.cssText = style;
         return e;
       };
+      // The hash uses a comma as separator, so a decimal comma has to become a point first.
+      const NUMBER = /^\\d+(\\.\\d+)?$/;
+      const cleanOffer = (v) => (v || "").trim().replace(",", ".");
       function render(d) {
         out.replaceChildren();
         const col = colors[d.labelClass] || "#d1d5db";
@@ -1286,7 +1301,12 @@ FRAGILITY_WIDGET = """
       form.addEventListener("submit", (e) => {
         e.preventDefault();
         const s = symEl.value.trim().toUpperCase();
-        const o = offEl.value.trim();
+        const o = cleanOffer(offEl.value);
+        if (o && !NUMBER.test(o)) {
+          out.replaceChildren(el("div", "The offer price must be a number, for example 12.5", "color:#ff6600;font-size:0.85rem;"));
+          return;
+        }
+        offEl.value = o;
         if (s) { location.hash = s + (o ? "," + o : ""); run(s, o); }
       });
       // Guard against malformed percent-encoding in URL hashes
@@ -1298,9 +1318,12 @@ FRAGILITY_WIDGET = """
       }
       const h = rawHash.split(",");
       if (h[0] && /^[A-Za-z0-9.-]{1,15}$/.test(h[0])) {
+        // Links made before 3.6.6 may hold a decimal comma ("SPCX,12,5"), so join the rest.
+        const offer = cleanOffer(h.slice(1).join("."));
+        const validOffer = NUMBER.test(offer) ? offer : "";
         symEl.value = h[0].toUpperCase();
-        if (h[1]) offEl.value = h[1];
-        run(h[0].toUpperCase(), h[1] || "");
+        offEl.value = validOffer;
+        run(h[0].toUpperCase(), validOffer);
       }
     })();
     </script>
