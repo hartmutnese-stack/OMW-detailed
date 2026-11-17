@@ -1,9 +1,15 @@
 // OPEN FRAGILITY CHECK (Cloudflare Worker, no dependencies)
-// Version 0.2.1 - English UI/API + International Ticker Support (e.g. RHM.DE)
+// Version 0.3.0 - Hardened caching, upstream limits, validation and error handling
 
-const VERSION = "0.2.1";
+const VERSION = "0.3.0";
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 const CACHE_SECONDS = 300;
+const NEGATIVE_CACHE_SECONDS = 300;
+const YAHOO_TIMEOUT_MS = 8000;
+const STOOQ_TIMEOUT_MS = 5000;
+const MAX_YAHOO_BYTES = 2_000_000;
+const MAX_STOOQ_BYTES = 2_000_000;
+const ALLOWED_QUERY_PARAMS = new Set(["symbol", "offer"]);
 const SYMBOL_RE = /^[A-Z0-9][A-Z0-9.\-]{0,14}$/;
 
 const DISCLAIMER =
@@ -29,15 +35,82 @@ function stdev(a) {
 const fmt = (x, d = 1) => x.toFixed(d);
 class UpstreamError extends Error {}
 
+function isValidCandle(row) {
+  return (
+    num(row.t) && row.t > 0 &&
+    num(row.o) && row.o > 0 &&
+    num(row.h) && row.h > 0 &&
+    num(row.l) && row.l > 0 &&
+    num(row.c) && row.c > 0 &&
+    (row.v === null || (num(row.v) && row.v >= 0)) &&
+    row.h >= Math.max(row.o, row.c, row.l) &&
+    row.l <= Math.min(row.o, row.c, row.h)
+  );
+}
+
+function normalizeRows(rows, limit = 260) {
+  const byTimestamp = new Map();
+  for (const row of rows) {
+    if (isValidCandle(row)) byTimestamp.set(row.t, row);
+  }
+  return Array.from(byTimestamp.values())
+    .sort((a, b) => a.t - b.t)
+    .slice(-limit);
+}
+
+async function readLimitedText(response, maxBytes, errorPrefix) {
+  const contentLength = Number(response.headers.get("content-length") || 0);
+  if (Number.isFinite(contentLength) && contentLength > maxBytes) {
+    throw new UpstreamError(`${errorPrefix}_response_too_large`);
+  }
+  const reader = response.body?.getReader();
+  if (!reader) {
+    const text = await response.text();
+    if (new TextEncoder().encode(text).byteLength > maxBytes) {
+      throw new UpstreamError(`${errorPrefix}_response_too_large`);
+    }
+    return text;
+  }
+  const decoder = new TextDecoder();
+  let received = 0;
+  let text = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    received += value.byteLength;
+    if (received > maxBytes) {
+      try { await reader.cancel(); } catch { /* ignore cancellation errors */ }
+      throw new UpstreamError(`${errorPrefix}_response_too_large`);
+    }
+    text += decoder.decode(value, { stream: true });
+  }
+  text += decoder.decode();
+  return text;
+}
+
 // ------------------------------------------------------------------ data sources
 async function fromYahoo(symbol, interval = "1d", range = "1y") {
   const url =
     `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}` +
     `?range=${range}&interval=${interval}&includePrePost=false`;
-  const res = await fetch(url, { headers: { "User-Agent": UA, Accept: "application/json" } });
+  let res;
+  try {
+    res = await fetch(url, {
+      headers: { "User-Agent": UA, Accept: "application/json" },
+      signal: AbortSignal.timeout(YAHOO_TIMEOUT_MS),
+    });
+  } catch (e) {
+    throw new UpstreamError(e?.name === "TimeoutError" ? "yahoo_timeout" : "yahoo_network_error");
+  }
   if (!res.ok) throw new UpstreamError(`yahoo_http_${res.status}`);
   let json;
-  try { json = await res.json(); } catch { throw new UpstreamError("yahoo_invalid_json"); }
+  try {
+    const text = await readLimitedText(res, MAX_YAHOO_BYTES, "yahoo");
+    json = JSON.parse(text);
+  } catch (e) {
+    if (e instanceof UpstreamError) throw e;
+    throw new UpstreamError("yahoo_invalid_json");
+  }
   const r = json?.chart?.result?.[0];
   if (!r) throw new UpstreamError("yahoo_no_result");
   const ts = r.timestamp || [];
@@ -45,13 +118,12 @@ async function fromYahoo(symbol, interval = "1d", range = "1y") {
   const rows = [];
   for (let i = 0; i < ts.length; i++) {
     const o = q.open?.[i], h = q.high?.[i], l = q.low?.[i], c = q.close?.[i], v = q.volume?.[i];
-    if (num(o) && num(h) && num(l) && num(c) && c > 0) {
-      rows.push({ t: ts[i] * 1000, o, h, l, c, v: num(v) ? v : 0 });
-    }
+    const row = { t: ts[i] * 1000, o, h, l, c, v: num(v) && v >= 0 ? v : null };
+    if (isValidCandle(row)) rows.push(row);
   }
   const m = r.meta || {};
   return {
-    rows, interval, source: interval === "1h" ? "yahoo (1h intraday)" : "yahoo",
+    rows: normalizeRows(rows), interval, source: interval === "1h" ? "yahoo (1h intraday)" : "yahoo",
     meta: { name: m.longName || m.shortName || symbol, exchange: m.fullExchangeName || m.exchangeName || "", currency: m.currency || "USD" },
   };
 }
@@ -59,9 +131,17 @@ async function fromYahoo(symbol, interval = "1d", range = "1y") {
 async function fromStooq(symbol) {
   const stooqSym = symbol.includes(".") ? symbol.toLowerCase() : `${symbol.toLowerCase()}.us`;
   const url = `https://stooq.com/q/d/l/?s=${encodeURIComponent(stooqSym)}&i=d`;
-  const res = await fetch(url, { headers: { "User-Agent": UA } });
+  let res;
+  try {
+    res = await fetch(url, {
+      headers: { "User-Agent": UA, Accept: "text/csv,text/plain;q=0.9" },
+      signal: AbortSignal.timeout(STOOQ_TIMEOUT_MS),
+    });
+  } catch (e) {
+    throw new UpstreamError(e?.name === "TimeoutError" ? "stooq_timeout" : "stooq_network_error");
+  }
   if (!res.ok) throw new UpstreamError(`stooq_http_${res.status}`);
-  const text = await res.text();
+  const text = await readLimitedText(res, MAX_STOOQ_BYTES, "stooq");
   const lines = text.trim().split(/\r?\n/);
   if (lines.length < 2 || !/^date,open/i.test(lines[0])) throw new UpstreamError("stooq_no_data");
   const rows = [];
@@ -69,9 +149,10 @@ async function fromStooq(symbol) {
     const [d, o, h, l, c, v] = line.split(",");
     const t = Date.parse(d + "T00:00:00Z");
     const O = parseFloat(o), H = parseFloat(h), L = parseFloat(l), C = parseFloat(c), V = parseFloat(v);
-    if ([t, O, H, L, C].every(Number.isFinite) && C > 0) rows.push({ t, o: O, h: H, l: L, c: C, v: Number.isFinite(V) ? V : 0 });
+    const row = { t, o: O, h: H, l: L, c: C, v: Number.isFinite(V) && V >= 0 ? V : null };
+    if (isValidCandle(row)) rows.push(row);
   }
-  return { rows: rows.slice(-260), interval: "1d", source: "stooq", meta: { name: symbol, exchange: "", currency: "USD" } };
+  return { rows: normalizeRows(rows), interval: "1d", source: "stooq", meta: { name: symbol, exchange: "", currency: "USD" } };
 }
 
 async function loadCandles(symbol) {
@@ -170,7 +251,7 @@ function computeFragility(rows, meta, opts = {}, interval = "1d") {
   } else add("gaps", "Overnight Gaps", null, "requires 4+ trading days", "Requires at least 4 daily closes.");
 
   // 5. volume
-  const vols = rows.map((r) => r.v);
+  const vols = rows.map((r) => r.v).filter((v) => v !== null);
   if (!isIntra && n >= 7 && vols.slice(-2).every((v) => v > 0)) {
     const prev = vols.slice(Math.max(0, n - 22), n - 2).filter((v) => v > 0);
     if (prev.length >= 5) {
@@ -247,45 +328,84 @@ function json(body, status = 200, extra = {}) {
 
 async function handleApi(request, ctx) {
   const url = new URL(request.url);
+
+  for (const key of url.searchParams.keys()) {
+    if (!ALLOWED_QUERY_PARAMS.has(key)) {
+      return json({ error: "unsupported_parameter", message: `Unsupported query parameter: ${key}` }, 400, {
+        "cache-control": "no-store",
+      });
+    }
+  }
+
   const symbol = (url.searchParams.get("symbol") || "").trim().toUpperCase();
-  if (!SYMBOL_RE.test(symbol)) return json({ error: "invalid_symbol", message: "Invalid ticker symbol (letters, numbers, dot, hyphen; max 15 chars)." }, 400);
+  if (!SYMBOL_RE.test(symbol)) {
+    return json({ error: "invalid_symbol", message: "Invalid ticker symbol (letters, numbers, dot, hyphen; max 15 chars)." }, 400, {
+      "cache-control": "no-store",
+    });
+  }
+
   let offer = null;
   const offerRaw = (url.searchParams.get("offer") || "").trim().replace(",", ".");
   if (offerRaw) {
     offer = Number(offerRaw);
-    if (!Number.isFinite(offer) || offer <= 0 || offer > 1e6) return json({ error: "invalid_offer", message: "Invalid offer/reference price." }, 400);
+    if (!Number.isFinite(offer) || offer <= 0 || offer > 1e6) {
+      return json({ error: "invalid_offer", message: "Invalid offer/reference price." }, 400, {
+        "cache-control": "no-store",
+      });
+    }
   }
 
+  const canonical = new URL("/api/fragility", url.origin);
+  canonical.searchParams.set("symbol", symbol);
+  if (offer !== null) canonical.searchParams.set("offer", String(offer));
+
   const cache = typeof caches !== "undefined" ? caches.default : null;
-  const cacheKey = new Request(url.toString(), { method: "GET" });
+  const cacheKey = new Request(canonical.toString(), { method: "GET" });
   if (cache) {
     const hit = await cache.match(cacheKey);
     if (hit) return hit;
   }
+
   let data;
   try {
     data = await loadCandles(symbol);
   } catch (e) {
-    return json({
+    const requestId = crypto.randomUUID();
+    console.error("fragility_upstream_error", { requestId, symbol, error: e instanceof Error ? e.message : String(e) });
+    const response = json({
       error: "no_data",
       message: `No price data found for ${symbol}. For non-US exchanges, add the suffix (e.g. RHM.DE for XETRA, VOD.L for London). Pre-IPO tickers like ANT have no market data until listing.`,
-      detail: e.message,
-    }, 502);
+      requestId,
+    }, 502, { "cache-control": `public, max-age=${NEGATIVE_CACHE_SECONDS}` });
+    if (cache && ctx && typeof ctx.waitUntil === "function") {
+      ctx.waitUntil(cache.put(cacheKey, response.clone()));
+    }
+    return response;
   }
+
+  data.rows = normalizeRows(data.rows);
+  if (data.rows.length === 0) {
+    return json({ error: "no_valid_data", message: "The upstream returned no valid market candles." }, 502, {
+      "cache-control": `public, max-age=${NEGATIVE_CACHE_SECONDS}`,
+    });
+  }
+
   const result = computeFragility(data.rows, data.meta, { offer }, data.interval);
   const body = {
     version: VERSION, symbol, name: data.meta.name, exchange: data.meta.exchange, currency: data.meta.currency,
     source: data.source, generatedAt: new Date().toISOString(), ...result, disclaimer: DISCLAIMER,
   };
   const response = json(body, 200, { "cache-control": `public, max-age=${CACHE_SECONDS}` });
-  if (cache && ctx && typeof ctx.waitUntil === "function") ctx.waitUntil(cache.put(cacheKey, response.clone()));
+  if (cache && ctx && typeof ctx.waitUntil === "function") {
+    ctx.waitUntil(cache.put(cacheKey, response.clone()));
+  }
   return response;
 }
 
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    if (request.method !== "GET") return new Response("Method Not Allowed", { status: 405 });
+    if (request.method !== "GET") return new Response("Method Not Allowed", { status: 405, headers: { Allow: "GET" } });
     if (url.pathname === "/api/fragility") return handleApi(request, ctx);
     if (env.ASSETS) return env.ASSETS.fetch(request);
     return new Response("Not Found", { status: 404 });
