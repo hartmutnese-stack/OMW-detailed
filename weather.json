@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "version": "3.6.6",
-  "timestamp": "2026-11-17 10:00 UTC",
-  "generated_at": "2026-11-17T10:00:56Z",
-  "valid_until": "2026-11-17T12:30:56Z",
+  "timestamp": "2026-11-17 10:15 UTC",
+  "generated_at": "2026-11-17T10:15:35Z",
+  "valid_until": "2026-11-17T12:45:35Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 3.05,
+  "run_duration_seconds": 3.51,
   "symbol": "☀️",
   "composite_score": 24,
   "composite_raw": 24.5,
@@ -75,7 +75,7 @@
     "grid_bots": {
       "status": "CAUTION",
       "color": "#ffcc00",
-      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 23.82 >= 20).",
+      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 23.67 >= 20).",
       "hysteresis": false,
       "confirmed_runs": 0
     },
@@ -102,18 +102,18 @@
   },
   "pillars": {
     "market_volatility": {
-      "score": 45,
-      "vix": 23.82,
+      "score": 44,
+      "vix": 23.67,
       "move_index": 101.28,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 6,
+      "score": 7,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2509.4,
-      "dvol_index": 44.2,
+      "btc_oi_mil": 2494.8,
+      "dvol_index": 44.4,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -152,18 +152,18 @@
       "cbp_fallback": false
     },
     "market_implied": {
-      "score": 45,
-      "vix": 23.82,
+      "score": 44,
+      "vix": 23.67,
       "move_index": 101.28,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 6,
+      "score": 7,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2509.4,
-      "dvol_index": 44.2,
+      "btc_oi_mil": 2494.8,
+      "dvol_index": 44.4,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
