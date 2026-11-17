@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "version": "3.6.5",
-  "timestamp": "2026-11-16 23:45 UTC",
-  "generated_at": "2026-11-16T23:45:42Z",
-  "valid_until": "2026-11-17T02:15:42Z",
+  "timestamp": "2026-11-17 00:01 UTC",
+  "generated_at": "2026-11-17T00:01:15Z",
+  "valid_until": "2026-11-17T02:31:15Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 3.49,
-  "symbol": "⛅",
-  "composite_score": 28,
-  "composite_raw": 28.65,
-  "display_score": 28,
-  "status": "SCATTERED CLOUDS",
-  "desc": "Operational noise within standard ranges. No immediate systemic fracture.",
-  "color": "#ffcc00",
+  "run_duration_seconds": 13.46,
+  "symbol": "☀️",
+  "composite_score": 23,
+  "composite_raw": 23.9,
+  "display_score": 23,
+  "status": "CLEAR SKIES",
+  "desc": "Systemic friction minimal. Normal market conditions across macro and crypto feeds.",
+  "color": "#00ff66",
   "data_quality": {
     "status": "HIGH",
     "score": 100,
@@ -109,10 +109,10 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 6,
+      "score": 5,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2403.7,
-      "dvol_index": 43.2,
+      "btc_oi_mil": 2415.5,
+      "dvol_index": 43.1,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -134,14 +134,14 @@
       "swaps_fallback": false
     },
     "credit_stress": {
-      "score": 58,
-      "sec_8k_filings": 20,
-      "sec_8k_item_204": 6,
+      "score": 27,
+      "sec_8k_filings": 13,
+      "sec_8k_item_204": 5,
       "fallback": false
     },
     "odds_and_ends": {
-      "score": 0,
-      "wiki_z": 0.03,
+      "score": 1,
+      "wiki_z": 0.1,
       "wiki_articles_ok": 4,
       "border_wait_m": 5,
       "border_state": "OBSERVED",
@@ -158,10 +158,10 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 6,
+      "score": 5,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2403.7,
-      "dvol_index": 43.2,
+      "btc_oi_mil": 2415.5,
+      "dvol_index": 43.1,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -183,14 +183,14 @@
       "swaps_fallback": false
     },
     "credit_statutory": {
-      "score": 58,
-      "sec_8k_filings": 20,
-      "sec_8k_item_204": 6,
+      "score": 27,
+      "sec_8k_filings": 13,
+      "sec_8k_item_204": 5,
       "fallback": false
     },
     "cognitive_physical": {
-      "score": 0,
-      "wiki_z": 0.03,
+      "score": 1,
+      "wiki_z": 0.1,
       "wiki_articles_ok": 4,
       "border_wait_m": 5,
       "border_state": "OBSERVED",
