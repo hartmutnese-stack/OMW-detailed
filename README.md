@@ -22,6 +22,7 @@ The scoring model is entirely heuristic. The weights, thresholds and normalizati
 [![Market Weather](badge.svg)](https://omw.hartmut-nese.workers.dev)
 https://img.shields.io/badge/License-MIT-blue.svg](https://opensource.org/licenses/MIT)
 
+
 ---
 
 ## Status
