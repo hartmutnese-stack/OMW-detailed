@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
   "version": "3.6.6",
-  "timestamp": "2026-11-17 15:30 UTC",
-  "generated_at": "2026-11-17T15:30:48Z",
-  "valid_until": "2026-11-17T18:00:48Z",
+  "timestamp": "2026-11-17 15:45 UTC",
+  "generated_at": "2026-11-17T15:45:36Z",
+  "valid_until": "2026-11-17T18:15:36Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 4.07,
+  "run_duration_seconds": 3.49,
   "symbol": "☀️",
   "composite_score": 24,
-  "composite_raw": 24.3,
+  "composite_raw": 24.7,
   "display_score": 24,
   "status": "CLEAR SKIES",
   "desc": "Systemic friction minimal. Normal market conditions across macro and crypto feeds.",
@@ -74,7 +74,7 @@
     "grid_bots": {
       "status": "CAUTION",
       "color": "#ffcc00",
-      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 22.78 >= 20).",
+      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 23.06 >= 20).",
       "hysteresis": false,
       "confirmed_runs": 0
     },
@@ -101,18 +101,18 @@
   },
   "pillars": {
     "market_volatility": {
-      "score": 42,
-      "vix": 22.78,
-      "move_index": 101.35,
+      "score": 43,
+      "vix": 23.06,
+      "move_index": 101.31,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 5,
+      "score": 6,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2481.4,
-      "dvol_index": 43.1,
+      "btc_oi_mil": 2436.9,
+      "dvol_index": 43.7,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -151,18 +151,18 @@
       "cbp_fallback": false
     },
     "market_implied": {
-      "score": 42,
-      "vix": 22.78,
-      "move_index": 101.35,
+      "score": 43,
+      "vix": 23.06,
+      "move_index": 101.31,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 5,
+      "score": 6,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2481.4,
-      "dvol_index": 43.1,
+      "btc_oi_mil": 2436.9,
+      "dvol_index": 43.7,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
