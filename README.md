@@ -1,73 +1,304 @@
 # OMW-detailed (Open Market Weather)
 
-A weather report for the markets, paired with a single-stock fragility check. One Python script pulls a handful of public macro and crypto feeds, squeezes them into a single score between 0 and 100, and displays it the way a weather app would: ☀️ when things look calm, ⛈️ when they don't. A Cloudflare Worker alongside it lets you inspect structural tension for any individual stock.
+OMW is a market-weather dashboard built from public macro, liquidity, credit and crypto data.
 
-I built the macro report for my own grid bot on Hyperliquid. Before it keeps buying dips, it checks macro plumbing and crypto leverage to see if something odd is going on. It's a rough heuristic: the weights are my own guesses and I haven't backtested any of it. Please don't treat it as a trading signal.
+Instead of trying to predict prices, it looks at the environment markets operate in and reduces it to a single weather-style score between 0 and 100. The idea is simple: before running a strategy, check whether the background conditions look calm, unstable or outright hostile.
 
-- Dashboard: https://omw.hartmut-nese.workers.dev
-- Macro JSON: https://omw.hartmut-nese.workers.dev/weather.json
-- Plain text: `curl -sL https://omw.hartmut-nese.workers.dev/weather.txt`
+The repository also includes a dependency-free Cloudflare Worker that calculates a structural fragility score for individual stocks.
+
+Originally this started as a risk filter for a Hyperliquid grid bot. Before the bot keeps buying dips, it checks liquidity, volatility and leverage conditions to avoid accumulating into obviously stressed markets.
+
+The scoring model is entirely heuristic. The weights, thresholds and normalization curves are hand-picked and have not been statistically calibrated or backtested.
+
+**This is not a trading signal.**
+
+## Live Endpoints
+
+- Dashboard: `https://omw.hartmut-nese.workers.dev`
+- Macro JSON: `https://omw.hartmut-nese.workers.dev/weather.json`
+- Plain text: `https://omw.hartmut-nese.workers.dev/weather.txt`
 - Stock Fragility API: `https://omw.hartmut-nese.workers.dev/api/fragility?symbol=SPCX&offer=135`
 
-[![Market Weather](https://omw.hartmut-nese.workers.dev/badge.svg)](https://omw.hartmut-nese.workers.dev)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Market Weather](https://omw.hartmut-nese.workers.dev)](https://omw.hartmut-nese.workers.dev)
+https://img.shields.io/badge/License-MIT-blue.svg](https://opensource.org/licenses/MIT)
+
+---
+
+## Status
+
+- Runtime: Python 3.8+
+- Dependencies: None (standard library only)
+- Update frequency: Every 17 minutes
+- Deployment: GitHub Actions + Cloudflare Workers
+- Public API: Yes
+
+---
+
+## Architecture
+
+```text
+Yahoo Finance
+FINRA
+SEC EDGAR
+US Treasury
+New York Fed
+Hyperliquid
+Deribit
+Wikimedia
+CBP
+       │
+       ▼
+   engine.py
+       │
+       ├── weather.json
+       ├── weather.txt
+       ├── index.html
+       ├── badge.svg
+       └── history.csv
+       │
+       ▼
+Cloudflare Worker
+(worker.js)
+       │
+       ▼
+Dashboard + APIs
+```
+
+---
 
 ## Why a weather report instead of charts?
 
-RSI, moving averages and Bollinger bands only show what price has already done. Sometimes a shock starts in traditional markets, and a grid bot only sees an attractive dip and keeps buying on the way down.
+Most technical indicators only describe what price has already done.
 
-I'm not trying to predict prices. It's like checking for an umbrella before leaving the house: I just want to know whether the market is calm enough for a grid to work, or whether a storm is coming that will run over my resting bids.
+Sometimes stress appears elsewhere first: volatility jumps, funding becomes extreme, credit events increase, liquidity starts moving around the system. A grid bot only sees a dip and may happily keep buying.
 
-## What goes into the macro score
+I'm not trying to predict prices. It's closer to checking the weather before leaving the house. If conditions are calm, business continues as usual. If a storm is building, it may be worth being more careful.
 
-| Pillar | Weight | What it looks at | Source |
-| :--- | :--- | :--- | :--- |
-| Market volatility | 20% | VIX and MOVE | Yahoo Finance (unofficial chart endpoint) |
-| Crypto leverage | 20% | BTC perp funding (annualized) and BTC implied volatility (DVOL) | Hyperliquid, Deribit |
-| Short volume | 15% | Short share of SPY volume | FINRA daily Reg SHO files |
-| Dollar liquidity | 20% | Treasury General Account balance and how fast it moves, Fed FX swap line usage | US Fiscal Data, NY Fed |
-| Credit stress | 15% | 8-K filings mentioning Item 2.04 (debt acceleration) in the last 14 days | SEC EDGAR full-text search |
-| Odds and ends | 10% | Wikipedia crisis traffic (6%) + truck wait times in Laredo (4%) | Wikimedia, CBP |
+---
 
-Each pillar is mapped to 0–100 with simple clamped scaling. VIX, for example, runs from 12 to 35, and BTC funding is only scored by how far it sits from Hyperliquid's baseline of about 11% APR. The six pillars are combined using the weights above. No model, no fitting. Below 25 is clear, below 50 scattered clouds, below 75 rain, above that a storm.
+## Market Weather vs Tactical Posture
 
-The daily FINRA file is around 15 MB, so the script streams it line by line instead of loading it into memory.
+The weather score and the tactical posture are intentionally separate.
 
-## Single-Stock Fragility Check (`worker.js`)
+The weather score describes market conditions.
 
-The dashboard includes an input field backed by a dependency-free Cloudflare Worker (`GET /api/fragility?symbol=...&offer=...`). It computes a 0–100 fragility index (`stable` < 30, `elevated` 30–54, `fragile` >= 55) from price and volume data:
+The tactical posture describes how a strategy reacts to those conditions using confirmation rules, hysteresis and feed-quality checks.
 
-| Factor | Weight | What it measures |
-| :--- | :--- | :--- |
-| Volatility | 25% | 10-day realized volatility (or 20h intraday for young IPOs) and ratio vs. prior 60 days |
-| Upside Extension | 15% | Distance above the 50-day SMA and 20-day run-up (upside stretches only) |
-| Peak Drawdown | 15% | Distance below the window high (maxes out at 40%+) |
-| Overnight Gaps | 10% | Average absolute open-to-prior-close gap over the last 20 days |
-| Volume Spike | 10% | Last 2 days' volume vs. prior 20 days |
-| Liquidity | 10% | Average daily turnover (log-scaled between 1M and 50M in quote currency) |
-| History Depth | 15% | Penalty for short histories (0 at 120+ trading days) |
-| Offer Price Distance | 15% | Optional distance to an IPO offer or reference price (`&offer=...`) |
+Because of that, a market can show:
 
-When an optional offer price is given, the available weights are normalized by their sum.
+```text
+CLEAR SKIES
+```
 
-- **Recent IPOs:** When daily candles have fewer than 5 trading days, the Worker falls back to 1-hour intraday candles (`interval=1h&range=5d`) and groups turnover by calendar day so newly listed stocks can be checked from Day 1.
-- **Descriptive `regime` state:** Because both a blow-off top and an already completed crash produce high fragility scores, the Worker adds a neutral state label (`Overextended to the upside`, `Pullback after overextension`, `Significant drawdown from peak`, or `Balanced / neutral`) without issuing buy or sell signals.
-- **International stocks:** Append Yahoo exchange suffixes for non-US listings (for example `RHM.DE` for XETRA or `VOD.L` for London).
-- **Data & caching:** Pulls from Yahoo Finance chart endpoints with Stooq daily CSV as a fallback. Results are cached at the Cloudflare edge for 5 minutes.
+while a grid strategy remains:
 
-## Things to know before you trust it
+```text
+CAUTION
+```
 
-- **Thresholds are guesses.** All the scaling ranges and cutoffs are hand-picked. Short volume and credit stress in particular can sit high in normal times. Every run appends the raw values to `history.csv`, so I can calibrate against real history later. The `composite` column there holds the score with decimals.
-- **Short volume is noisy.** Much of it is routine market maker hedging rather than directional bets. I use it as a weak signal.
-- **Treasury cash moves both ways.** The liquidity score goes up on large swings in either direction, whether the government is draining or injecting reserves. Swap line usage below $1B counts as noise.
-- **Wikipedia is experimental.** I compare the last 7 days of page views with the three weeks before, so the weekend dip cancels out. The API leaves out days without data. Articles that average fewer than 20 views a day (counting those days as zero) are skipped, because a z-score on a handful of views is mostly noise. For the others a missing day is treated as a gap, not as zero, and an article with too many gaps is skipped as well. `feed_health` says how many of the six articles were usable. It still follows school terms and news cycles, which is why it only gets 6% of the total (60% of a pillar worth 10%).
-- **Different clocks.** Crypto data is real-time. FINRA and Treasury numbers arrive once a day with a lag.
-- **Unofficial endpoints.** Yahoo, CBP and SEC search aren't stable APIs and can break without notice.
-- **Fallbacks.** If a feed fails, the script retries once and then uses a hard-coded default (like VIX 16.5). `weather.json` lists affected pillars under `fallback_flags`, and `feed_health` has the state of every single feed: `OK`, `FALLBACK`, `STALE` or, for the Laredo feed at night, `CLOSED`. Where there is an error, it says which kind (`TIMEOUT`, `HTTP_429` and so on). The dashboard shows tags like `[fallback: tga, ny fed]`. In `history.csv` those values are left empty.
-- **Stale data.** A feed counts as stale when its newest data point is too old: Yahoo quotes after 5 days, FINRA files after 4, Treasury records after 6. That leaves room for weekends and holiday weekends. The dashboard shows `[stale: yahoo]` for these.
-- **Data quality.** `data_quality` turns fallback and stale feeds into a score from 0 to 100 (HIGH from 90, MEDIUM from 70). `fallback_count` and `stale_count` tell the two apart. `run_status` is `DEGRADED` when any feed is on fallback or stale. While that is the case, ACTIVE is shown as CAUTION (how it comes back is described under "Using it in a bot"). The Laredo feed being `CLOSED` at night doesn't count.
+until conditions have been stable long enough.
 
-## Run it
+---
+
+## What Goes Into the Macro Score
+
+| Pillar | Weight | What it Measures | Source |
+|---------|---------|---------|---------|
+| Market Volatility | 20% | VIX and MOVE | Yahoo Finance |
+| Crypto Leverage | 20% | BTC perp funding and implied volatility (DVOL) | Hyperliquid, Deribit |
+| Short Volume | 15% | Short volume share in SPY | FINRA Reg SHO |
+| Dollar Liquidity | 20% | Treasury General Account and Fed FX swap usage | US Fiscal Data, NY Fed |
+| Credit Stress | 15% | 8-K filings mentioning Item 2.04 | SEC EDGAR |
+| Odds and Ends | 10% | Wikipedia crisis traffic and border wait times | Wikimedia, CBP |
+
+Each pillar is normalized to a score between 0 and 100 and then combined using the weights above.
+
+Weather classification:
+
+| Score | Weather |
+|---------|---------|
+| 0–24 | ☀️ Clear Skies |
+| 25–49 | ⛅ Scattered Clouds |
+| 50–74 | 🌧 Rain |
+| 75–100 | ⛈ Storm |
+
+Example:
+
+```json
+{
+  "composite_score": 24,
+  "status": "CLEAR SKIES"
+}
+```
+
+The FINRA daily file is around 15 MB, so it is streamed line-by-line rather than loaded into memory.
+
+---
+
+## Weather Output
+
+The main API endpoint is:
+
+```text
+GET /weather.json
+```
+
+Example:
+
+```json
+{
+  "composite_score": 24,
+  "status": "CLEAR SKIES",
+  "data_quality": {
+    "status": "HIGH"
+  },
+  "tactical_posture": {
+    "grid_bots": {
+      "status": "CAUTION"
+    }
+  }
+}
+```
+
+Important fields:
+
+| Field | Description |
+|---------|---------|
+| `composite_score` | Rounded market weather score |
+| `composite_raw` | Score with decimals |
+| `status` | Weather classification |
+| `data_quality` | Feed-health summary |
+| `transition` | State-machine information |
+| `tactical_posture` | Strategy-oriented guidance |
+
+---
+
+## Single-Stock Fragility Check
+
+The repository includes a dependency-free Cloudflare Worker:
+
+```text
+GET /api/fragility?symbol=SPCX&offer=135
+```
+
+The Worker calculates a structural fragility score between 0 and 100.
+
+Classification:
+
+| Score | Label |
+|---------|---------|
+| 0–29 | stable |
+| 30–54 | elevated |
+| 55–100 | fragile |
+
+Example:
+
+```json
+{
+  "score": 61,
+  "label": "fragile",
+  "regime": "Overextended to the upside",
+  "quality": "high"
+}
+```
+
+### Factors
+
+| Factor | Weight | What it Measures |
+|---------|---------|---------|
+| Volatility | 25% | Realized volatility and change versus baseline |
+| Upside Extension | 15% | Distance above moving averages |
+| Peak Drawdown | 15% | Distance below recent highs |
+| Overnight Gaps | 10% | Average gap risk |
+| Volume Spike | 10% | Recent volume versus baseline |
+| Liquidity | 10% | Daily turnover |
+| History Depth | 15% | Available price history |
+| Offer Price Distance | 15% | Optional IPO/reference price comparison |
+
+### Additional Behaviour
+
+- Falls back to intraday data for very recent IPOs.
+- Supports international Yahoo Finance ticker suffixes (`RHM.DE`, `VOD.L`, etc.).
+- Uses Stooq daily data as a fallback.
+- Results are cached at the Cloudflare edge for five minutes.
+- Supports an optional IPO or reference price through `offer=`.
+
+The Worker does not attempt to forecast direction. A high score does not mean a stock will go down, only that the price structure appears unstable.
+
+---
+
+## Reliability Features
+
+The system tracks the health of every data source individually.
+
+Feeds can be:
+
+```text
+OK
+FALLBACK
+STALE
+CLOSED
+```
+
+Examples:
+
+- Yahoo quotes older than five days become stale.
+- FINRA files older than four days become stale.
+- Treasury data older than six days becomes stale.
+- CBP may report `CLOSED` when no official data is available overnight.
+
+Each run produces:
+
+- feed-health information
+- data-quality metrics
+- fallback indicators
+- stale-data indicators
+- runtime statistics
+
+The weather report continues operating when a feed fails by falling back to predefined neutral values. A failed feed never causes an overly optimistic market status.
+
+---
+
+## Data Quality
+
+`data_quality` summarizes feed health:
+
+```json
+{
+  "status": "HIGH",
+  "score": 100,
+  "fallback_count": 0,
+  "stale_count": 0
+}
+```
+
+Classification:
+
+| Score | Status |
+|---------|---------|
+| 90–100 | HIGH |
+| 70–89 | MEDIUM |
+| 0–69 | LOW |
+
+If any feed runs on fallback or stale data:
+
+```json
+"run_status": "DEGRADED"
+```
+
+A degraded run can prevent tactical posture from returning immediately to its most aggressive state.
+
+---
+
+## Running Locally
+
+### Requirements
+
+- Python 3.8+
+- Internet access
+- No external packages
+
+### Start
 
 ```bash
 git clone https://github.com/hartmutnese-stack/OMW-detailed.git
@@ -75,115 +306,118 @@ cd OMW-detailed
 python3 engine.py
 ```
 
-`engine.py` uses Python 3.8+ (standard library only). It writes `index.html`, `weather.json`, `weather.txt` and `badge.svg` into the current folder and appends a row to `history.csv`. Each file is written to a temp file first and then renamed, and `weather.json` goes last, so nobody reads a half-written file. If something unexpected goes wrong, the run stops and the old files stay where they are.
+The script generates:
 
-I run it every 17 minutes via GitHub Actions (committing outputs and `history.csv` back to the repo) and serve the whole bundle via Cloudflare Workers with Static Assets (`worker.js`, `wrangler.jsonc`, `.assetsignore`). Hosting purely on static services like GitHub Pages works for the macro weather files, but `/api/fragility` requires the Cloudflare Worker proxy to avoid browser CORS blocks.
+```text
+index.html
+weather.json
+weather.txt
+badge.svg
+history.csv
+```
 
-Optional environment variables:
+Files are written atomically using a temporary-file-and-rename pattern. If a run fails unexpectedly, the previous outputs remain untouched.
 
-- `OMW_CONTACT`: a contact string for the User-Agent sent to SEC EDGAR and Wikimedia, ideally an e-mail address. Both ask for one and may block requests without it. Set this if you fork it.
-- `OMW_BASE_URL`: the public URL of your deployment. The script reads the previous state from there when there is no recent local `weather.json`.
-- `OMW_REPO_URL`: the link to the GitHub repo shown on the dashboard and in the text file. Set this if you fork it.
-- `OMW_VALID_FOR_HOURS`: how long a run counts as valid. Default 2.5.
-- `OMW_STATE_MAX_AGE_HOURS`: a previous state older than this is ignored. Default 4.
-- `OMW_RECOVERY_CONFIRMATIONS`: how many runs in a row it takes to step the grid status down, and how many clean runs it takes before ACTIVE comes back after a feed problem. Default 2, set it to 1 to turn both delays off.
-- `OMW_COLD_START_STATUS`: the grid status to assume when there is no recent previous state. It also decides which thresholds apply (see below). Default `CAUTION`.
+---
 
-## Using it in a bot
+## Deployment
 
-`weather.json` includes a `tactical_posture` block with rule-based reference heuristics that a bot can read. It's not advice. For grid bots it works like this:
+The reference deployment runs on:
 
-- **PAUSED** if the crypto score or the overall score is 65 or higher.
-- **ACTIVE** if the overall score is below 35, VIX is below 20, the crypto score is below 40, and every feed is healthy (data quality HIGH, nothing on fallback or stale).
-- **CAUTION** for anything in between.
+- GitHub Actions
+- Cloudflare Workers
+- Cloudflare Static Assets
 
-Two things decide the grid status, and the script tracks them separately: the market state (what the scores say) and the data quality (whether every feed delivered).
+The macro-weather outputs can be served from any static host.
 
-The market state has two rules against flip-flopping. First, leaving CAUTION or PAUSED takes clearer readings than entering. Going back to ACTIVE needs an overall score below 28, VIX below 18.5 and a crypto score below 35. PAUSED holds until both the overall and the crypto score are below 58. Second, stepping down takes two runs in a row. Going to a more cautious status happens right away. If the runs in a row disagree, say CAUTION and then ACTIVE, the status steps down only to the more cautious one.
+The stock fragility endpoint requires the Cloudflare Worker because browsers cannot call the upstream data sources directly due to CORS restrictions.
 
-The market state never steps down on fallback data from the VIX or the crypto feed. Those numbers are neutral defaults, so an outage can't release a PAUSED status.
+---
 
-Data quality only affects ACTIVE. While any feed is on fallback or stale, ACTIVE is shown as CAUTION. Once everything is healthy again, ACTIVE comes back after the same number of clean runs (two by default). A data hiccup doesn't count as a market CAUTION, so it doesn't put you on the stricter return band.
+## Environment Variables
 
-`transition` has the details: `market_status`, the confirmation count and `clean_runs`. `hysteresis` is `true` while any of these rules holds the status back, and `action` says which.
+| Variable | Description |
+|---------|---------|
+| `OMW_CONTACT` | Contact string for SEC and Wikimedia requests |
+| `OMW_BASE_URL` | Public deployment URL |
+| `OMW_REPO_URL` | Repository URL shown in outputs |
+| `OMW_VALID_FOR_HOURS` | Output validity window |
+| `OMW_STATE_MAX_AGE_HOURS` | Maximum age of previous state |
+| `OMW_RECOVERY_CONFIRMATIONS` | Confirmation count for state transitions |
+| `OMW_COLD_START_STATUS` | Initial state when no previous state exists |
 
-The script gets the previous status from the local `weather.json` or from the live site, and ignores it if it is older than four hours. Without a usable previous state it assumes `CAUTION` (`OMW_COLD_START_STATUS`) and uses the stricter thresholds that go with it. So the first run after a restart is cautious even in calm markets, and ACTIVE can follow one run later if the readings hold.
+---
 
-A calm overall score can still land on CAUTION. In this trimmed example the score is 24, but the last status was CAUTION and VIX (18.69) hasn't dropped below the 18.5 needed to leave it:
+## Using It in a Bot
+
+`weather.json` contains a `tactical_posture` block intended as a machine-readable reference layer.
+
+Example:
 
 ```json
 {
-  "schema_version": 1,
-  "version": "3.6.5",
-  "generated_at": "2026-11-11T10:37:26Z",
-  "valid_until": "2026-11-11T13:07:26Z",
-  "run_status": "COMPLETE",
-  "symbol": "☀️",
-  "composite_score": 24,
-  "composite_raw": 24.25,
-  "status": "CLEAR SKIES",
-  "data_quality": {
-    "status": "HIGH",
-    "score": 100,
-    "degraded_feeds": []
-  },
-  "transition": {
-    "market_status": "CAUTION",
-    "clean_runs": 2
-  },
   "tactical_posture": {
     "grid_bots": {
-      "status": "CAUTION",
-      "action": "Reference: wider grid bands (+15-25%). Return band active (VIX 18.69 >= 18.5).",
-      "hysteresis": true,
-      "confirmed_runs": 0
+      "status": "CAUTION"
     }
   }
 }
 ```
 
-`composite_score` is the whole number, rounded down, so it never disagrees with `status`. `composite_raw` has the decimals.
+The default grid posture works roughly like this:
 
-Here is how my bot reads it. If the request fails, it carries on:
+- `ACTIVE` when conditions are calm and all feeds are healthy
+- `CAUTION` for transitional situations
+- `PAUSED` during elevated stress
 
-```python
-import aiohttp
+The underlying logic includes:
 
-async def check_macro_circuit_breaker():
-    url = "https://omw.hartmut-nese.workers.dev/weather.json"
-    timeout = aiohttp.ClientTimeout(total=2.0)
-    try:
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            async with session.get(url) as resp:
-                data = await resp.json()
-        status = data["tactical_posture"]["grid_bots"]["status"]
-        if status == "PAUSED":
-            await cancel_resting_bids_only()      # your own implementation
-        elif status == "CAUTION":
-            apply_grid_modifiers(spread_mult=1.25, size_mult=0.6)
-    except Exception:
-        pass
-```
+- hysteresis
+- confirmation rules
+- feed-quality safeguards
+- recovery confirmation counts
 
-If the workflow stops, the last file stays online and just gets old. Each run is valid for 2.5 hours (`valid_until`), so it's worth checking that before you act on it. Put this right after `data = await resp.json()`:
+The protocol is intentionally conservative. It takes longer to leave a cautious state than to enter one.
 
-```python
-from datetime import datetime, timezone
+---
 
-valid_until = datetime.fromisoformat(data["valid_until"].replace("Z", "+00:00"))
-if datetime.now(timezone.utc) > valid_until:
-    return  # the file is old, carry on without it
-```
+## Things to Know Before You Trust It
 
-The other entries in `tactical_posture` (dip buying, crypto perps, short volume, collateral) are plain status labels. Their `status` values can change between versions, so don't hard-code too much around them. The `action` texts are free text that I reword now and then, so read `status` and don't parse them.
+- All thresholds are heuristic.
+- No historical calibration has been performed yet.
+- Short-volume data is noisy.
+- Treasury flows can indicate either liquidity injection or liquidity withdrawal.
+- Wikipedia traffic is experimental.
+- Crypto, Treasury and FINRA data operate on different schedules.
+- Several data sources rely on unofficial or undocumented endpoints.
+- Public APIs can change or disappear without notice.
+
+The project records raw values in `history.csv` to support future calibration work.
+
+---
 
 ## Disclaimer
 
-This is a hobby project that reads public data. Nothing here is investment advice, a trading signal, or an offer of any kind. The numbers can be delayed, heuristic, or wrong — use at your own risk.
+This is a hobby project that aggregates public data.
+
+Nothing in this repository is investment advice, a trading signal, or a recommendation to buy, sell or hold any asset.
+
+The underlying data can be delayed, incomplete or wrong. Use it at your own risk.
+
+---
 
 ## Contributing
 
-If you have ideas for better normalization curves, cleaner weights, or historical data to calibrate against, open an issue or a PR.
+If you have ideas for:
+
+- better normalization curves
+- more robust feeds
+- historical calibration
+- additional market indicators
+
+feel free to open an issue or submit a pull request.
+
+---
 
 ## License
 
