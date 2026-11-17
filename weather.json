@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "version": "3.6.6",
-  "timestamp": "2026-11-17 17:30 UTC",
-  "generated_at": "2026-11-17T17:30:46Z",
-  "valid_until": "2026-11-17T20:00:46Z",
+  "timestamp": "2026-11-17 17:45 UTC",
+  "generated_at": "2026-11-17T17:45:37Z",
+  "valid_until": "2026-11-17T20:15:37Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 3.71,
+  "run_duration_seconds": 3.98,
   "symbol": "⛅",
   "composite_score": 26,
   "composite_raw": 26.1,
@@ -74,7 +74,7 @@
     "grid_bots": {
       "status": "CAUTION",
       "color": "#ffcc00",
-      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 25.33 >= 20).",
+      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 25.02 >= 20).",
       "hysteresis": false,
       "confirmed_runs": 0
     },
@@ -102,8 +102,8 @@
   "pillars": {
     "market_volatility": {
       "score": 49,
-      "vix": 25.33,
-      "move_index": 104.25,
+      "vix": 25.02,
+      "move_index": 103.97,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
@@ -111,8 +111,8 @@
     "crypto_leverage": {
       "score": 7,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2431.2,
-      "dvol_index": 44.7,
+      "btc_oi_mil": 2447.0,
+      "dvol_index": 44.9,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -144,7 +144,7 @@
       "score": 1,
       "wiki_z": 0.1,
       "wiki_articles_ok": 4,
-      "border_wait_m": 10,
+      "border_wait_m": 15,
       "border_state": "OBSERVED",
       "fallback": false,
       "wiki_fallback": false,
@@ -152,8 +152,8 @@
     },
     "market_implied": {
       "score": 49,
-      "vix": 25.33,
-      "move_index": 104.25,
+      "vix": 25.02,
+      "move_index": 103.97,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
@@ -161,8 +161,8 @@
     "crypto_247": {
       "score": 7,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2431.2,
-      "dvol_index": 44.7,
+      "btc_oi_mil": 2447.0,
+      "dvol_index": 44.9,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -194,7 +194,7 @@
       "score": 1,
       "wiki_z": 0.1,
       "wiki_articles_ok": 4,
-      "border_wait_m": 10,
+      "border_wait_m": 15,
       "border_state": "OBSERVED",
       "fallback": false,
       "wiki_fallback": false,
