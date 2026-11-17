@@ -19,8 +19,8 @@ The scoring model is entirely heuristic. The weights, thresholds and normalizati
 - Plain text: `https://omw.hartmut-nese.workers.dev/weather.txt`
 - Stock Fragility API: `https://omw.hartmut-nese.workers.dev/api/fragility?symbol=SPCX&offer=135`
 
-[![Market Weather](badge.svg)](https://omw.hartmut-nese.workers.dev)
-https://img.shields.io/badge/License-MIT-blue.svg](https://opensource.org/licenses/MIT)
+[![Market Weather](https://omw.hartmut-nese.workers.dev/badge.svg)](https://omw.hartmut-nese.workers.dev)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 
 ---
