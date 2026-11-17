@@ -58,7 +58,7 @@
 <body>
     <div class="header">
         <strong>OPEN MARKET WEATHER OBSERVATORY</strong><br>
-        <span class="badge-sub">TIMESTAMP: 2026-11-17 08:30 UTC // COMPLETE // v3.6.5</span><br>
+        <span class="badge-sub">TIMESTAMP: 2026-11-17 08:32 UTC // COMPLETE // v3.6.6</span><br>
         <div class="scope-notice">SCOPE: Rule-based environmental regime observer. Not an investment signal or advisory tool.</div>
         <div class="header-links">
             <a href="weather.json">[Raw JSON API]</a> &nbsp;|&nbsp;
@@ -80,7 +80,7 @@
         <div class="posture-item">
             <span class="posture-label">GRID BOTS</span>
             <span class="posture-status" style="color: #ffcc00">CAUTION</span>
-            <span class="posture-action">Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 23.11 &gt;= 20).</span>
+            <span class="posture-action">Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 23.14 &gt;= 20).</span>
         </div>
         <div class="posture-item">
             <span class="posture-label">DIP BUYING</span>
@@ -90,7 +90,7 @@
         <div class="posture-item">
             <span class="posture-label">CRYPTO PERPS</span>
             <span class="posture-status" style="color: #00ff66">NOMINAL</span>
-            <span class="posture-action">Moderate derivatives bias (+6.6% APR).</span>
+            <span class="posture-action">Moderate derivatives bias (+6.5% APR).</span>
         </div>
         <div class="posture-item">
             <span class="posture-label">SHORT VOLUME</span>
@@ -114,13 +114,13 @@
                 <tr>
                     <td><strong>1. Market Volatility</strong></td>
                     <td>S&amp;P 500 VIX + Treasury MOVE Index</td>
-                    <td>VIX: 23.11 | MOVE: 101.28</td>
+                    <td>VIX: 23.14 | MOVE: 101.28</td>
                     <td><span class="score-pill">43/100</span></td>
                 </tr>
                 <tr>
                     <td><strong>2. Crypto Leverage</strong></td>
                     <td>Hyperliquid BTC funding + Deribit DVOL</td>
-                    <td>Funding: +6.6% APR | DVOL: 43.6%</td>
+                    <td>Funding: +6.5% APR | DVOL: 43.7%</td>
                     <td><span class="score-pill">9/100</span></td>
                 </tr>
                 <tr>
@@ -185,6 +185,9 @@
         if (style) e.style.cssText = style;
         return e;
       };
+      // The hash uses a comma as separator, so a decimal comma has to become a point first.
+      const NUMBER = /^\d+(\.\d+)?$/;
+      const cleanOffer = (v) => (v || "").trim().replace(",", ".");
       function render(d) {
         out.replaceChildren();
         const col = colors[d.labelClass] || "#d1d5db";
@@ -233,7 +236,12 @@
       form.addEventListener("submit", (e) => {
         e.preventDefault();
         const s = symEl.value.trim().toUpperCase();
-        const o = offEl.value.trim();
+        const o = cleanOffer(offEl.value);
+        if (o && !NUMBER.test(o)) {
+          out.replaceChildren(el("div", "The offer price must be a number, for example 12.5", "color:#ff6600;font-size:0.85rem;"));
+          return;
+        }
+        offEl.value = o;
         if (s) { location.hash = s + (o ? "," + o : ""); run(s, o); }
       });
       // Guard against malformed percent-encoding in URL hashes
@@ -245,9 +253,12 @@
       }
       const h = rawHash.split(",");
       if (h[0] && /^[A-Za-z0-9.-]{1,15}$/.test(h[0])) {
+        // Links made before 3.6.6 may hold a decimal comma ("SPCX,12,5"), so join the rest.
+        const offer = cleanOffer(h.slice(1).join("."));
+        const validOffer = NUMBER.test(offer) ? offer : "";
         symEl.value = h[0].toUpperCase();
-        if (h[1]) offEl.value = h[1];
-        run(h[0].toUpperCase(), h[1] || "");
+        offEl.value = validOffer;
+        run(h[0].toUpperCase(), validOffer);
       }
     })();
     </script>
