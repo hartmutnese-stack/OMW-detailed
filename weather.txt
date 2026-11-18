@@ -1,7 +1,7 @@
 
 ======================================================================
  OPEN MARKET WEATHER OBSERVATORY // HYBRID MACRO & CRYPTO // v3.6.6
- 2026-11-18 00:00 UTC // COMPLETE // VALID UNTIL 2026-11-18T02:30:54Z
+ 2026-11-18 00:15 UTC // COMPLETE // VALID UNTIL 2026-11-18T02:45:42Z
 ======================================================================
 
  SCOPE: Experimental rule-based macro regime observer.
