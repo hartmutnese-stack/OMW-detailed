@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.6.6",
-  "timestamp": "2026-11-18 22:30 UTC",
-  "generated_at": "2026-11-18T22:30:44Z",
-  "valid_until": "2026-11-19T01:00:44Z",
+  "timestamp": "2026-11-18 22:45 UTC",
+  "generated_at": "2026-11-18T22:45:35Z",
+  "valid_until": "2026-11-19T01:15:35Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 1.95,
+  "run_duration_seconds": 4.14,
   "symbol": "☀️",
-  "composite_score": 19,
-  "composite_raw": 19.25,
-  "display_score": 19,
+  "composite_score": 21,
+  "composite_raw": 21.75,
+  "display_score": 21,
   "status": "CLEAR SKIES",
   "desc": "Systemic friction minimal. Normal market conditions across macro and crypto feeds.",
   "color": "#00ff66",
@@ -86,7 +86,7 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Moderate derivatives bias (+4.1% APR)."
+      "action": "Moderate derivatives bias (+5.1% APR)."
     },
     "dark_pool": {
       "status": "NOMINAL",
@@ -109,9 +109,9 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 13,
-      "btc_funding_apr": 4.1,
-      "btc_oi_mil": 2453.9,
+      "score": 12,
+      "btc_funding_apr": 5.1,
+      "btc_oi_mil": 2438.4,
       "dvol_index": 45.8,
       "fallback": false,
       "hl_fallback": false,
@@ -134,8 +134,8 @@
       "swaps_fallback": false
     },
     "credit_stress": {
-      "score": 31,
-      "sec_8k_filings": 14,
+      "score": 49,
+      "sec_8k_filings": 18,
       "sec_8k_item_204": 5,
       "sec_8k_item_204_complete": true,
       "fallback": false
@@ -159,9 +159,9 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 13,
-      "btc_funding_apr": 4.1,
-      "btc_oi_mil": 2453.9,
+      "score": 12,
+      "btc_funding_apr": 5.1,
+      "btc_oi_mil": 2438.4,
       "dvol_index": 45.8,
       "fallback": false,
       "hl_fallback": false,
@@ -184,8 +184,8 @@
       "swaps_fallback": false
     },
     "credit_statutory": {
-      "score": 31,
-      "sec_8k_filings": 14,
+      "score": 49,
+      "sec_8k_filings": 18,
       "sec_8k_item_204": 5,
       "sec_8k_item_204_complete": true,
       "fallback": false
