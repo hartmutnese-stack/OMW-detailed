@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.6.6",
-  "timestamp": "2026-11-18 22:15 UTC",
-  "generated_at": "2026-11-18T22:15:38Z",
-  "valid_until": "2026-11-19T00:45:38Z",
+  "timestamp": "2026-11-18 22:30 UTC",
+  "generated_at": "2026-11-18T22:30:44Z",
+  "valid_until": "2026-11-19T01:00:44Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 4.63,
+  "run_duration_seconds": 1.95,
   "symbol": "☀️",
-  "composite_score": 23,
-  "composite_raw": 23.55,
-  "display_score": 23,
+  "composite_score": 19,
+  "composite_raw": 19.25,
+  "display_score": 19,
   "status": "CLEAR SKIES",
   "desc": "Systemic friction minimal. Normal market conditions across macro and crypto feeds.",
   "color": "#00ff66",
@@ -86,12 +86,12 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Moderate derivatives bias (+1.2% APR)."
+      "action": "Moderate derivatives bias (+4.1% APR)."
     },
     "dark_pool": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Normal short volume share on SPY (51.6%)."
+      "action": "Normal short volume share on SPY (45.1%)."
     },
     "collateral": {
       "status": "STABLE",
@@ -109,18 +109,18 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 15,
-      "btc_funding_apr": 1.2,
-      "btc_oi_mil": 2468.8,
-      "dvol_index": 45.9,
+      "score": 13,
+      "btc_funding_apr": 4.1,
+      "btc_oi_mil": 2453.9,
+      "dvol_index": 45.8,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
     },
     "short_volume": {
-      "score": 26,
-      "spy_short_volume_ratio": 51.6,
-      "report_date": "20261117",
+      "score": 0,
+      "spy_short_volume_ratio": 45.1,
+      "report_date": "20261118",
       "fallback": false
     },
     "dollar_liquidity": {
@@ -159,18 +159,18 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 15,
-      "btc_funding_apr": 1.2,
-      "btc_oi_mil": 2468.8,
-      "dvol_index": 45.9,
+      "score": 13,
+      "btc_funding_apr": 4.1,
+      "btc_oi_mil": 2453.9,
+      "dvol_index": 45.8,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
     },
     "dark_pool_finra": {
-      "score": 26,
-      "spy_short_volume_ratio": 51.6,
-      "report_date": "20261117",
+      "score": 0,
+      "spy_short_volume_ratio": 45.1,
+      "report_date": "20261118",
       "fallback": false
     },
     "liquidity_plumbing": {
