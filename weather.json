@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.6.6",
-  "timestamp": "2026-11-19 11:15 UTC",
-  "generated_at": "2026-11-19T11:15:35Z",
-  "valid_until": "2026-11-19T13:45:35Z",
+  "timestamp": "2026-11-19 11:30 UTC",
+  "generated_at": "2026-11-19T11:30:48Z",
+  "valid_until": "2026-11-19T14:00:48Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 3.06,
+  "run_duration_seconds": 3.92,
   "symbol": "☀️",
-  "composite_score": 21,
-  "composite_raw": 21.0,
-  "display_score": 21,
+  "composite_score": 20,
+  "composite_raw": 20.4,
+  "display_score": 20,
   "status": "CLEAR SKIES",
   "desc": "Systemic friction minimal. Normal market conditions across macro and crypto feeds.",
   "color": "#00ff66",
@@ -55,8 +55,7 @@
       "detail": "4/6 articles usable"
     },
     "cbp": {
-      "status": "CLOSED",
-      "detail": "Laredo feed reachable; no delay value"
+      "status": "OK"
     }
   },
   "transition": {
@@ -75,7 +74,7 @@
     "grid_bots": {
       "status": "CAUTION",
       "color": "#ffcc00",
-      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 21.99 >= 20).",
+      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 22.01 >= 20).",
       "hysteresis": false,
       "confirmed_runs": 0
     },
@@ -85,9 +84,9 @@
       "action": "Orderly pullbacks. Liquidity supports absorption."
     },
     "crypto_perps": {
-      "status": "HEAVY SHORT",
-      "color": "#ff6600",
-      "action": "Negative perp funding (-7.2% APR). Potential short squeeze."
+      "status": "NOMINAL",
+      "color": "#00ff66",
+      "action": "Moderate derivatives bias (-4.4% APR)."
     },
     "dark_pool": {
       "status": "NOMINAL",
@@ -103,17 +102,17 @@
   "pillars": {
     "market_volatility": {
       "score": 39,
-      "vix": 21.99,
+      "vix": 22.01,
       "move_index": 98.15,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 22,
-      "btc_funding_apr": -7.2,
-      "btc_oi_mil": 2396.6,
-      "dvol_index": 46.3,
+      "score": 19,
+      "btc_funding_apr": -4.4,
+      "btc_oi_mil": 2401.0,
+      "dvol_index": 46.0,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -145,25 +144,25 @@
       "score": 4,
       "wiki_z": 0.31,
       "wiki_articles_ok": 4,
-      "border_wait_m": null,
-      "border_state": "CLOSED",
+      "border_wait_m": 0,
+      "border_state": "OBSERVED",
       "fallback": false,
       "wiki_fallback": false,
       "cbp_fallback": false
     },
     "market_implied": {
       "score": 39,
-      "vix": 21.99,
+      "vix": 22.01,
       "move_index": 98.15,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 22,
-      "btc_funding_apr": -7.2,
-      "btc_oi_mil": 2396.6,
-      "dvol_index": 46.3,
+      "score": 19,
+      "btc_funding_apr": -4.4,
+      "btc_oi_mil": 2401.0,
+      "dvol_index": 46.0,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -195,8 +194,8 @@
       "score": 4,
       "wiki_z": 0.31,
       "wiki_articles_ok": 4,
-      "border_wait_m": null,
-      "border_state": "CLOSED",
+      "border_wait_m": 0,
+      "border_state": "OBSERVED",
       "fallback": false,
       "wiki_fallback": false,
       "cbp_fallback": false
