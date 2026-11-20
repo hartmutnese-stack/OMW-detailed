@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.6.6",
-  "timestamp": "2026-11-20 03:45 UTC",
-  "generated_at": "2026-11-20T03:45:36Z",
-  "valid_until": "2026-11-20T06:15:36Z",
+  "timestamp": "2026-11-20 04:00 UTC",
+  "generated_at": "2026-11-20T04:00:52Z",
+  "valid_until": "2026-11-20T06:30:52Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 5.95,
+  "run_duration_seconds": 2.72,
   "symbol": "⛅",
-  "composite_score": 28,
-  "composite_raw": 28.95,
-  "display_score": 28,
+  "composite_score": 29,
+  "composite_raw": 29.15,
+  "display_score": 29,
   "status": "SCATTERED CLOUDS",
   "desc": "Operational noise within standard ranges. No immediate systemic fracture.",
   "color": "#ffcc00",
@@ -109,10 +109,10 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 8,
+      "score": 9,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2425.3,
-      "dvol_index": 45.6,
+      "btc_oi_mil": 2441.4,
+      "dvol_index": 46.5,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -159,10 +159,10 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 8,
+      "score": 9,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2425.3,
-      "dvol_index": 45.6,
+      "btc_oi_mil": 2441.4,
+      "dvol_index": 46.5,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
