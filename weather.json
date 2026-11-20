@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "version": "3.6.6",
-  "timestamp": "2026-11-20 18:30 UTC",
-  "generated_at": "2026-11-20T18:30:47Z",
-  "valid_until": "2026-11-20T21:00:47Z",
+  "timestamp": "2026-11-20 18:45 UTC",
+  "generated_at": "2026-11-20T18:45:32Z",
+  "valid_until": "2026-11-20T21:15:32Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 4.79,
+  "run_duration_seconds": 2.39,
   "symbol": "⛅",
   "composite_score": 32,
   "composite_raw": 32.15,
@@ -74,7 +74,7 @@
     "grid_bots": {
       "status": "CAUTION",
       "color": "#ffcc00",
-      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 32.26 >= 20).",
+      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 32.17 >= 20).",
       "hysteresis": false,
       "confirmed_runs": 0
     },
@@ -101,18 +101,18 @@
   },
   "pillars": {
     "market_volatility": {
-      "score": 65,
-      "vix": 32.26,
-      "move_index": 103.8,
+      "score": 64,
+      "vix": 32.17,
+      "move_index": 103.86,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 14,
+      "score": 15,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2345.8,
-      "dvol_index": 51.5,
+      "btc_oi_mil": 2332.2,
+      "dvol_index": 52.0,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -151,18 +151,18 @@
       "cbp_fallback": false
     },
     "market_implied": {
-      "score": 65,
-      "vix": 32.26,
-      "move_index": 103.8,
+      "score": 64,
+      "vix": 32.17,
+      "move_index": 103.86,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 14,
+      "score": 15,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2345.8,
-      "dvol_index": 51.5,
+      "btc_oi_mil": 2332.2,
+      "dvol_index": 52.0,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
