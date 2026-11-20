@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
-  "version": "3.6.6",
-  "timestamp": "2026-11-20 21:30 UTC",
-  "generated_at": "2026-11-20T21:30:48Z",
-  "valid_until": "2026-11-21T00:00:48Z",
+  "version": "3.7.0",
+  "timestamp": "2026-11-20 21:38 UTC",
+  "generated_at": "2026-11-20T21:38:16Z",
+  "valid_until": "2026-11-21T00:08:16Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 4.02,
-  "symbol": "⛅",
-  "composite_score": 34,
-  "composite_raw": 34.45,
-  "display_score": 34,
-  "status": "SCATTERED CLOUDS",
-  "desc": "Operational noise within standard ranges. No immediate systemic fracture.",
-  "color": "#ffcc00",
+  "run_duration_seconds": 3.92,
+  "symbol": "🌧️",
+  "composite_score": 54,
+  "composite_raw": 54.0,
+  "display_score": 54,
+  "status": "SQUALL / DOWNPOUR",
+  "desc": "Elevated friction: notable divergence in equity volatility, crypto leverage or liquidity plumbing.",
+  "color": "#ff6600",
   "data_quality": {
     "status": "HIGH",
     "score": 100,
@@ -59,34 +59,34 @@
     }
   },
   "transition": {
-    "previous_status": "PAUSED",
-    "candidate_status": "CAUTION",
+    "previous_status": "CAUTION",
+    "candidate_status": "PAUSED",
     "required_runs": 2,
     "cold_start": false,
-    "confirmed_runs": 2,
+    "confirmed_runs": 0,
     "recovering": false,
     "recovery_target": null,
     "status_changed": true,
-    "market_status": "CAUTION",
+    "market_status": "PAUSED",
     "clean_runs": 2
   },
   "tactical_posture": {
     "grid_bots": {
-      "status": "CAUTION",
-      "color": "#ffcc00",
-      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 35.89 >= 20).",
+      "status": "PAUSED",
+      "color": "#ff0033",
+      "action": "Dislocation risk elevated (overall 54.0, vol 72, crypto 22). Reference: pause new grid bids.",
       "hysteresis": false,
-      "confirmed_runs": 2
+      "confirmed_runs": 0
     },
     "dip_buying": {
-      "status": "FAVORABLE",
-      "color": "#00ff66",
-      "action": "Orderly pullbacks. Liquidity supports absorption."
+      "status": "DEFENSIVE",
+      "color": "#ff6600",
+      "action": "Support looks fragile; falling-knife risk is elevated."
     },
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Moderate derivatives bias (+7.7% APR)."
+      "action": "Neutral baseline funding (+9.6% APR)."
     },
     "dark_pool": {
       "status": "NOMINAL",
@@ -94,25 +94,25 @@
       "action": "Normal short volume share on SPY (42.2%)."
     },
     "collateral": {
-      "status": "STABLE",
-      "color": "#00ff66",
-      "action": "No meaningful central bank swap operations."
+      "status": "WATCH",
+      "color": "#ffcc00",
+      "action": "Swap operations quiet, but overall market friction is elevated."
     }
   },
   "pillars": {
     "market_volatility": {
       "score": 72,
       "vix": 35.89,
-      "move_index": 106.25,
+      "move_index": 106.31,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 17,
-      "btc_funding_apr": 7.7,
-      "btc_oi_mil": 2277.2,
-      "dvol_index": 52.7,
+      "score": 22,
+      "btc_funding_apr": 9.6,
+      "btc_oi_mil": 2293.6,
+      "dvol_index": 52.5,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -153,16 +153,16 @@
     "market_implied": {
       "score": 72,
       "vix": 35.89,
-      "move_index": 106.25,
+      "move_index": 106.31,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 17,
-      "btc_funding_apr": 7.7,
-      "btc_oi_mil": 2277.2,
-      "dvol_index": 52.7,
+      "score": 22,
+      "btc_funding_apr": 9.6,
+      "btc_oi_mil": 2293.6,
+      "dvol_index": 52.5,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
