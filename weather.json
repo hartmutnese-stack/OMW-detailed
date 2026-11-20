@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "version": "3.7.0",
-  "timestamp": "2026-11-20 21:38 UTC",
-  "generated_at": "2026-11-20T21:38:16Z",
-  "valid_until": "2026-11-21T00:08:16Z",
+  "timestamp": "2026-11-20 21:45 UTC",
+  "generated_at": "2026-11-20T21:45:32Z",
+  "valid_until": "2026-11-21T00:15:32Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 3.92,
+  "run_duration_seconds": 2.69,
   "symbol": "🌧️",
   "composite_score": 54,
   "composite_raw": 54.0,
@@ -59,14 +59,14 @@
     }
   },
   "transition": {
-    "previous_status": "CAUTION",
+    "previous_status": "PAUSED",
     "candidate_status": "PAUSED",
     "required_runs": 2,
     "cold_start": false,
     "confirmed_runs": 0,
     "recovering": false,
     "recovery_target": null,
-    "status_changed": true,
+    "status_changed": false,
     "market_status": "PAUSED",
     "clean_runs": 2
   },
@@ -74,7 +74,7 @@
     "grid_bots": {
       "status": "PAUSED",
       "color": "#ff0033",
-      "action": "Dislocation risk elevated (overall 54.0, vol 72, crypto 22). Reference: pause new grid bids.",
+      "action": "Dislocation risk elevated (overall 54.0, vol 72, crypto 24). Reference: pause new grid bids.",
       "hysteresis": false,
       "confirmed_runs": 0
     },
@@ -86,7 +86,7 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Neutral baseline funding (+9.6% APR)."
+      "action": "Neutral baseline funding (+11.0% APR)."
     },
     "dark_pool": {
       "status": "NOMINAL",
@@ -109,10 +109,10 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 22,
-      "btc_funding_apr": 9.6,
-      "btc_oi_mil": 2293.6,
-      "dvol_index": 52.5,
+      "score": 24,
+      "btc_funding_apr": 11.0,
+      "btc_oi_mil": 2296.1,
+      "dvol_index": 53.3,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -159,10 +159,10 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 22,
-      "btc_funding_apr": 9.6,
-      "btc_oi_mil": 2293.6,
-      "dvol_index": 52.5,
+      "score": 24,
+      "btc_funding_apr": 11.0,
+      "btc_oi_mil": 2296.1,
+      "dvol_index": 53.3,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
