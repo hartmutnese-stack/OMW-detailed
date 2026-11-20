@@ -1,14 +1,18 @@
 {
   "schema_version": 1,
-  "version": "3.7.0",
-  "timestamp": "2026-11-20 21:45 UTC",
-  "generated_at": "2026-11-20T21:45:32Z",
-  "valid_until": "2026-11-21T00:15:32Z",
+  "version": "3.7.1",
+  "timestamp": "2026-11-20 21:58 UTC",
+  "generated_at": "2026-11-20T21:58:00Z",
+  "valid_until": "2026-11-21T00:28:00Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 2.69,
+  "run_duration_seconds": 3.58,
   "symbol": "🌧️",
   "composite_score": 54,
   "composite_raw": 54.0,
+  "composite_weighted": 36.45,
+  "storm_floor": 54.0,
+  "storm_floor_active": true,
+  "storm_driver": "market_volatility",
   "display_score": 54,
   "status": "SQUALL / DOWNPOUR",
   "desc": "Elevated friction: notable divergence in equity volatility, crypto leverage or liquidity plumbing.",
@@ -74,7 +78,7 @@
     "grid_bots": {
       "status": "PAUSED",
       "color": "#ff0033",
-      "action": "Dislocation risk elevated (overall 54.0, vol 72, crypto 24). Reference: pause new grid bids.",
+      "action": "Dislocation risk elevated (overall 54.0, vol 72, crypto 27). Reference: pause new grid bids.",
       "hysteresis": false,
       "confirmed_runs": 0
     },
@@ -109,10 +113,14 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 24,
+      "score": 27,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2296.1,
-      "dvol_index": 53.3,
+      "btc_oi_mil": 2249.2,
+      "btc_24h_change_pct": -4.07,
+      "dvol_index": 54.2,
+      "funding_stress": 8,
+      "dvol_stress": 32,
+      "price_shock_stress": 25,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -125,6 +133,7 @@
     },
     "dollar_liquidity": {
       "score": 35,
+      "swap_score": 0,
       "tga_billions": 891.2,
       "tga_5d_flow": -33.4,
       "tga_flow_days": 6,
@@ -159,10 +168,14 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 24,
+      "score": 27,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2296.1,
-      "dvol_index": 53.3,
+      "btc_oi_mil": 2249.2,
+      "btc_24h_change_pct": -4.07,
+      "dvol_index": 54.2,
+      "funding_stress": 8,
+      "dvol_stress": 32,
+      "price_shock_stress": 25,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -175,6 +188,7 @@
     },
     "liquidity_plumbing": {
       "score": 35,
+      "swap_score": 0,
       "tga_billions": 891.2,
       "tga_5d_flow": -33.4,
       "tga_flow_days": 6,
