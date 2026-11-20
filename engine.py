@@ -1,8 +1,3 @@
-Perfekt – danke für deine exakte v3.6.6! Jetzt sind alle deine Verfeinerungen
-(seen_dates, tga_flow_days, count_confirmed_item_204,
-vix_fallback/move_fallback, die omw-Defaults und der Komma-Hash-Fix im Widget)
-vollständig erhalten und sauber mit den 3 Sturm-Updates (v3.7.0) verschmolzen.
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -1501,8 +1496,3 @@ if __name__ == "__main__":
     except Exception as exc:
         log("ERROR", "ENGINE", f"Run failed, previous outputs stay in place: {type(exc).__name__}: {exc}")
         raise
-
-(Und wenn du das Repo-Wetter einmal direkt testen willst: Nach dem Commit auf
-Run workflow klicken – mit dem aktuellen VIX-Wert von 38,26 wird dein Dashboard
-jetzt direkt von SCATTERED CLOUDS (33) auf 🌧️ SQUALL / DOWNPOUR (54)
-umspringen!)
