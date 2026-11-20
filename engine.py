@@ -2,18 +2,34 @@
 # -*- coding: utf-8 -*-
 """
 OPEN MARKET WEATHER OBSERVATORY // HYBRID MACRO & CRYPTO
-Version: 3.7.0 (stdlib only)
+Version: 3.7.1 (stdlib only)
+
+Changes in 3.7.1 (on top of 3.7.0):
+  - BTC price shock: the crypto pillar now also reads the 24h price move of BTC from
+    the same Hyperliquid request (markPx against prevDayPx). A 24h drop of 2% or less
+    counts for nothing, 10% or more is the maximum, in between it is linear. Only
+    drops count. This is the part that sees a crash after it has happened: after a
+    wave of liquidations, funding falls back to its baseline and DVOL can stay low,
+    so funding and DVOL alone looked calm on a day with BTC down 7%.
+    Switch it off with OMW_PRICE_SHOCK=0.
+  - The storm floor takes the swap-line stress instead of the whole dollar liquidity
+    pillar. That pillar is mostly the Treasury cash swing, which moves by large
+    amounts around tax dates and settlements without being a stress signal. Real
+    swap line usage still counts.
+  - The JSON shows composite_weighted, storm_floor, storm_floor_active and
+    storm_driver, so you can see when the floor decided the score. history.csv still
+    logs composite_raw, which includes the floor from 3.7.0 on.
+  - The 3.7.0 notes were corrected: the floor is 75% of the strongest of the three
+    inputs, so SQUALL / DOWNPOUR (composite 50) needs one of them at 67 or more.
+    VIX 35 with MOVE near 95 gives a market pillar of 65: grid PAUSED, composite
+    about 49, SCATTERED CLOUDS.
 
 Changes in 3.7.0:
-  - Non-linear storm floor: composite = max(weighted_avg, core_peak * 0.75) across
-    market_volatility, crypto_leverage, and dollar_liquidity. Prevents slow macro
-    pillars or low short-volume ratios during long liquidations from masking an
-    acute market crash (e.g. VIX > 35 now properly triggers SQUALL / DOWNPOUR).
-  - Equity panic trigger: market_volatility >= 65 (hysteresis < 58) now triggers
-    PAUSED for grid bots directly alongside crypto_leverage and composite.
-  - Crypto post-liquidation floor: blends funding and DVOL with max(f, v) * 0.85
-    so forced liquidations resetting funding back to baseline do not drop the
-    crypto stress score while implied volatility remains elevated.
+  - Storm floor: composite = max(weighted average, 0.75 * strongest of market
+    volatility, crypto leverage and swap stress).
+  - Equity panic trigger: market_volatility >= 65 (stay until < 58) pauses grid bots.
+  - Crypto floor: the crypto score is at least 85% of the stronger of funding and
+    DVOL stress, so a funding reset after liquidations does not hide high DVOL.
 """
 
 import csv
@@ -61,7 +77,7 @@ def env_number(name, default, cast=float, minimum=None):
     return value
 
 
-VERSION = "3.7.0"
+VERSION = "3.7.1"
 SCHEMA_VERSION = 1
 BASE_URL = os.environ.get(
     "OMW_BASE_URL", "https://omw.hartmut-nese.workers.dev"
@@ -82,6 +98,15 @@ COMPLIANT_HEADERS = {"User-Agent": f"MarketWeatherObservatory/{VERSION} ({CONTAC
 
 FUNDING_BASELINE_APR = 10.95
 SWAP_NOISE_B = 1.0
+
+# BTC 24h price shock (downside only). Up to SHOCK_FREE_DROP_PCT nothing counts,
+# at SHOCK_FULL_DROP_PCT the stress is 100, linear in between.
+PRICE_SHOCK_ENABLED = os.environ.get("OMW_PRICE_SHOCK", "1").strip() != "0"
+SHOCK_FREE_DROP_PCT = 2.0
+SHOCK_FULL_DROP_PCT = 10.0
+
+# The composite is at least this share of the strongest acute pillar.
+STORM_FLOOR_FACTOR = 0.75
 
 PAUSE_ENTER = 65.0
 PAUSE_STAY = 58.0
@@ -303,7 +328,7 @@ def get_market_volatility(feed_health):
 
 
 # ==============================================================================
-# PILLAR 2: CRYPTO LEVERAGE (HYPERLIQUID FUNDING & DERIBIT DVOL)
+# PILLAR 2: CRYPTO LEVERAGE (HYPERLIQUID FUNDING, 24H PRICE & DERIBIT DVOL)
 # ==============================================================================
 def funding_stress(apr):
     dev = apr - FUNDING_BASELINE_APR
@@ -312,8 +337,17 @@ def funding_stress(apr):
     return clamp(int(8 + min(d, limit) * 1.2 + max(0.0, d - limit) * steep))
 
 
+def price_shock_stress(change_pct):
+    """Stress from a 24h BTC price move. Only drops count: 2% -> 0, 6.6% -> 57, 10% -> 100."""
+    if change_pct is None:
+        return 0
+    drop = max(0.0, -change_pct)
+    span = SHOCK_FULL_DROP_PCT - SHOCK_FREE_DROP_PCT
+    return clamp(int((drop - SHOCK_FREE_DROP_PCT) * 100 / span))
+
+
 def get_crypto_leverage(feed_health):
-    funding_apr, oi_mil, dvol = FUNDING_BASELINE_APR, 0.0, 52.0
+    funding_apr, oi_mil, dvol, btc_change = FUNDING_BASELINE_APR, 0.0, 52.0, None
     hl_fallback = dvol_fallback = True
 
     payload = json.dumps({"type": "metaAndAssetCtxs"}).encode("utf-8")
@@ -328,9 +362,15 @@ def get_crypto_leverage(feed_health):
             universe, ctxs = hr.data[0]["universe"], hr.data[1]
             idx = next(i for i, c in enumerate(universe) if c.get("name") == "BTC")
             ctx = ctxs[idx]
-            funding_apr = round(float(ctx["funding"]) * 24 * 365 * 100, 1)
-            oi_mil = round(float(ctx["openInterest"]) * float(ctx["oraclePx"]) / 1_000_000, 1)
-            hl_fallback, hl_error = False, None
+            funding = round(float(ctx["funding"]) * 24 * 365 * 100, 1)
+            oi = round(float(ctx["openInterest"]) * float(ctx["oraclePx"]) / 1_000_000, 1)
+            change = None
+            if PRICE_SHOCK_ENABLED:
+                mark, prev_px = float(ctx["markPx"]), float(ctx["prevDayPx"])
+                if mark <= 0 or prev_px <= 0:
+                    raise ValueError("non-positive price")
+                change = round((mark / prev_px - 1) * 100, 2)
+            funding_apr, oi_mil, btc_change, hl_fallback, hl_error = funding, oi, change, False, None
         except (TypeError, KeyError, IndexError, StopIteration, ValueError, AttributeError):
             hl_error = "INVALID_RESPONSE"
             log("WARN", "HYPERLIQUID", "response not usable, using fallback funding")
@@ -351,12 +391,18 @@ def get_crypto_leverage(feed_health):
 
     f_stress = funding_stress(funding_apr)
     v_stress = clamp(int((dvol - 42.0) * (100 / 38)))
-    crypto_score = max(int(f_stress * 0.6 + v_stress * 0.4), int(max(f_stress, v_stress) * 0.85))
+    shock = price_shock_stress(btc_change)
+    # Blend, but never below 85% of the stronger of funding and DVOL, and never below the price shock
+    crypto_score = max(int(f_stress * 0.6 + v_stress * 0.4), int(max(f_stress, v_stress) * 0.85), shock)
     return {
         "score": crypto_score,
         "btc_funding_apr": funding_apr,
         "btc_oi_mil": oi_mil,
+        "btc_24h_change_pct": btc_change,
         "dvol_index": dvol,
+        "funding_stress": f_stress,
+        "dvol_stress": v_stress,
+        "price_shock_stress": shock,
         "fallback": hl_fallback or dvol_fallback,
         "hl_fallback": hl_fallback,
         "dvol_fallback": dvol_fallback,
@@ -508,6 +554,7 @@ def get_dollar_liquidity(feed_health):
     swap_score = clamp(int(swap_b * 10))
     return {
         "score": int(tga_score * 0.7 + swap_score * 0.3),
+        "swap_score": swap_score,
         "tga_billions": round(tga_bal, 1),
         "tga_5d_flow": round(tga_change, 1),
         "tga_flow_days": tga_flow_days,
@@ -962,6 +1009,15 @@ def generate_tactical_posture(composite, p, quality, prev):
 # ==============================================================================
 # MAIN ENGINE
 # ==============================================================================
+def storm_floor_inputs(pillars):
+    """The acute pillars that can set the floor: name -> score."""
+    return {
+        "market_volatility": pillars["market_volatility"]["score"],
+        "crypto_leverage": pillars["crypto_leverage"]["score"],
+        "swap_stress": pillars["dollar_liquidity"]["swap_score"],
+    }
+
+
 def calculate_systemic_weather():
     started = utc_now()
     prev = previous_state()
@@ -976,12 +1032,12 @@ def calculate_systemic_weather():
         "odds_and_ends": get_odds_and_ends(feed_health),
     }
     weighted = sum(pillars[k]["score"] * w for k, w in WEIGHTS.items())
-    core_peak = max(
-        pillars["market_volatility"]["score"],
-        pillars["crypto_leverage"]["score"],
-        pillars["dollar_liquidity"]["score"],
-    )
-    composite = round(max(weighted, core_peak * 0.75), 2)
+    acute = storm_floor_inputs(pillars)
+    core_peak = max(acute.values())
+    storm_floor = core_peak * STORM_FLOOR_FACTOR
+    floor_active = storm_floor > weighted
+    storm_driver = max(acute, key=acute.get) if floor_active else None
+    composite = round(max(weighted, storm_floor), 2)
     composite_score = int(math.floor(composite + 1e-9))
     fallback_flags = {k: v["fallback"] for k, v in pillars.items()}
     quality = data_quality(feed_health)
@@ -1016,6 +1072,10 @@ def calculate_systemic_weather():
         "symbol": symbol,
         "composite_score": composite_score,
         "composite_raw": composite,
+        "composite_weighted": round(weighted, 2),
+        "storm_floor": round(storm_floor, 2),
+        "storm_floor_active": floor_active,
+        "storm_driver": storm_driver,
         "display_score": composite_score,
         "status": status,
         "desc": desc,
@@ -1028,7 +1088,8 @@ def calculate_systemic_weather():
         "pillars": pillars,
     }
     log("INFO", "ENGINE",
-        f"Composite={composite:.2f} Quality={quality['score']} "
+        f"Composite={composite:.2f} (weighted {weighted:.2f}, floor {storm_floor:.2f}"
+        f"{' ACTIVE:' + storm_driver if floor_active else ''}) Quality={quality['score']} "
         f"Degraded={','.join(quality['degraded_feeds']) or 'none'} "
         f"Grid={tactical['grid_bots']['status']}")
     return result
@@ -1055,6 +1116,8 @@ def pillar_rows(p, feed_health):
     mv, cl, sv = p["market_volatility"], p["crypto_leverage"], p["short_volume"]
     dl, cs, oe = p["dollar_liquidity"], p["credit_stress"], p["odds_and_ends"]
     funding_str = f"{cl['btc_funding_apr']:+.1f}%"
+    change = cl.get("btc_24h_change_pct")
+    change_str = f" | BTC 24h: {change:+.1f}%" if change is not None else ""
     if oe["border_wait_m"] is not None:
         border = f"{oe['border_wait_m']}m"
     elif oe.get("border_state") == "UNKNOWN":
@@ -1064,8 +1127,8 @@ def pillar_rows(p, feed_health):
     rows = [
         ("market_volatility", "Market Volatility", "S&P 500 VIX + Treasury MOVE Index",
          f"VIX: {mv['vix']} | MOVE: {mv['move_index']}"),
-        ("crypto_leverage", "Crypto Leverage", "Hyperliquid BTC funding + Deribit DVOL",
-         f"Funding: {funding_str} APR | DVOL: {cl['dvol_index']}%"),
+        ("crypto_leverage", "Crypto Leverage", "Hyperliquid BTC funding and 24h price + Deribit DVOL",
+         f"Funding: {funding_str} APR | DVOL: {cl['dvol_index']}%{change_str}"),
         ("short_volume", "Short Volume", "FINRA Reg SHO daily file (SPY)",
          f"Short ratio: {sv['spy_short_volume_ratio']}% ({sv['report_date']})"),
         ("dollar_liquidity", "Dollar Liquidity", "U.S. TGA cash + NY Fed swap lines",
@@ -1134,6 +1197,11 @@ def render_text(data, rows):
         " NOTICE: Purely heuristic. Not an investment signal, solicitation, or advice.",
         "",
         f" OVERALL STATUS : {data['status']} [Score: {data['composite_score']}/100]",
+    ]
+    if data.get("storm_floor_active"):
+        lines.append(f" STORM FLOOR    : active, set by {data['storm_driver']} "
+                     f"(weighted {data['composite_weighted']}, floor {data['storm_floor']})")
+    lines += [
         f" DATA QUALITY   : {q['status']} [{q['score']}/100]",
     ]
     if q["degraded_feeds"]:
@@ -1195,6 +1263,7 @@ HTML_CSS = """
         .status-symbol { font-size: 3.8rem; line-height: 1; margin-bottom: 0.6rem; display: block; }
         .status-title { font-size: 1.5rem; color: __COLOR__; margin: 0 0 0.5rem 0; font-weight: bold; }
         .status-desc { color: #9ca3af; font-size: 0.95rem; max-width: 650px; margin: auto; }
+        .storm-note { margin-top: 0.8rem; font-size: 0.8rem; color: #f59e0b; }
         .quality { margin-top: 0.8rem; font-size: 0.85rem; font-weight: bold; }
         .q-high { color: #00ff66; }
         .q-medium { color: #ffcc00; }
@@ -1349,6 +1418,10 @@ def render_html(data, rows):
     css = HTML_CSS.replace("__COLOR__", data["color"])
     quality_class = "q-" + q["status"].lower()
     degraded = f" // degraded: {esc(', '.join(q['degraded_feeds']))}" if q["degraded_feeds"] else ""
+    storm_note = ""
+    if data.get("storm_floor_active"):
+        storm_note = (f'<div class="storm-note">Storm floor active: {esc(str(data["storm_driver"]))} sets the score '
+                      f'(weighted average {data["composite_weighted"]}, floor {data["storm_floor"]})</div>')
 
     posture_html = "".join(
         f"""
@@ -1398,7 +1471,7 @@ def render_html(data, rows):
     <div class="status-box">
         <span class="status-symbol">{symbol}</span>
         <div class="status-title">{status} (SCORE: {score}/100)</div>
-        <div class="status-desc">{desc}</div>
+        <div class="status-desc">{desc}</div>{storm_note}
         <div class="quality {quality_class}">DATA QUALITY: {q['status']} ({q['score']}/100){degraded}</div>
     </div>
 
