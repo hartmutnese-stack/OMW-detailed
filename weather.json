@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-21 16:30 UTC",
-  "generated_at": "2026-11-21T16:30:47Z",
-  "valid_until": "2026-11-21T19:00:47Z",
+  "timestamp": "2026-11-21 16:45 UTC",
+  "generated_at": "2026-11-21T16:45:34Z",
+  "valid_until": "2026-11-21T19:15:34Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 3.53,
+  "run_duration_seconds": 2.37,
   "symbol": "🌧️",
   "composite_score": 54,
   "composite_raw": 54.0,
@@ -90,7 +90,7 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Moderate derivatives bias (-4.0% APR)."
+      "action": "Moderate derivatives bias (-2.1% APR)."
     },
     "dark_pool": {
       "status": "HIGH",
@@ -114,11 +114,11 @@
     },
     "crypto_leverage": {
       "score": 37,
-      "btc_funding_apr": -4.0,
-      "btc_oi_mil": 2255.5,
-      "btc_24h_change_pct": 1.39,
-      "dvol_index": 58.9,
-      "funding_stress": 25,
+      "btc_funding_apr": -2.1,
+      "btc_oi_mil": 2263.4,
+      "btc_24h_change_pct": 0.9,
+      "dvol_index": 59.0,
+      "funding_stress": 23,
       "dvol_stress": 44,
       "price_shock_stress": 0,
       "fallback": false,
@@ -169,11 +169,11 @@
     },
     "crypto_247": {
       "score": 37,
-      "btc_funding_apr": -4.0,
-      "btc_oi_mil": 2255.5,
-      "btc_24h_change_pct": 1.39,
-      "dvol_index": 58.9,
-      "funding_stress": 25,
+      "btc_funding_apr": -2.1,
+      "btc_oi_mil": 2263.4,
+      "btc_24h_change_pct": 0.9,
+      "dvol_index": 59.0,
+      "funding_stress": 23,
       "dvol_stress": 44,
       "price_shock_stress": 0,
       "fallback": false,
