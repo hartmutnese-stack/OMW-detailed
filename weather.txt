@@ -1,26 +1,27 @@
 
 ======================================================================
  OPEN MARKET WEATHER OBSERVATORY // HYBRID MACRO & CRYPTO // v3.7.1
- 2026-11-21 05:00 UTC // COMPLETE // VALID UNTIL 2026-11-21T07:30:54Z
+ 2026-11-21 05:15 UTC // COMPLETE // VALID UNTIL 2026-11-21T07:45:40Z
 ======================================================================
 
  SCOPE: Experimental rule-based macro regime observer.
  NOTICE: Purely heuristic. Not an investment signal, solicitation, or advice.
 
- OVERALL STATUS : SQUALL / DOWNPOUR [Score: 59/100]
+ OVERALL STATUS : SQUALL / DOWNPOUR [Score: 61/100]
+ STORM FLOOR    : active, set by crypto_leverage (weighted 60.5, floor 61.5)
  DATA QUALITY   : HIGH [100/100]
  CURRENT REGIME : Elevated friction: notable divergence in equity volatility, crypto leverage or liquidity plumbing.
 
  --- OPERATIONAL POSTURE (RULE-BASED REFERENCE HEURISTICS) ---
- [*] GRID BOTS    : PAUSED -> Dislocation risk elevated (overall 59.5, vol 72, crypto 77). Reference: pause new grid bids.
+ [*] GRID BOTS    : PAUSED -> Dislocation risk elevated (overall 61.5, vol 72, crypto 82). Reference: pause new grid bids.
  [*] DIP BUYING   : DEFENSIVE -> Support looks fragile; falling-knife risk is elevated.
- [*] CRYPTO PERPS : NOMINAL -> Neutral baseline funding (+11.0% APR).
+ [*] CRYPTO PERPS : NOMINAL -> Moderate derivatives bias (+0.2% APR).
  [*] SHORT VOLUME : HIGH -> High short volume share on SPY (64.2%).
  [*] COLLATERAL   : WATCH -> Swap operations quiet, but overall market friction is elevated.
 
  --- 6 PILLARS ---
  [1] Market Volatility : Score 72/100 (VIX: 35.89 | MOVE: 106.31)
- [2] Crypto Leverage   : Score 77/100 (Funding: +11.0% APR | DVOL: 61.1% | BTC 24h: -8.2%)
+ [2] Crypto Leverage   : Score 82/100 (Funding: +0.2% APR | DVOL: 61.0% | BTC 24h: -8.6%)
  [3] Short Volume      : Score 89/100 (Short ratio: 64.2% (20261120))
  [4] Dollar Liquidity  : Score 35/100 (TGA: $891.2B | Swaps: $0.0B)
  [5] Credit Stress     : Score 53/100 (Filings: 19)
