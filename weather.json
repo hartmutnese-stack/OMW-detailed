@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
   "version": "3.7.2",
-  "timestamp": "2026-11-21 06:21 UTC",
-  "generated_at": "2026-11-21T06:21:28Z",
-  "valid_until": "2026-11-21T08:51:28Z",
+  "timestamp": "2026-11-21 06:30 UTC",
+  "generated_at": "2026-11-21T06:30:41Z",
+  "valid_until": "2026-11-21T09:00:41Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 4.48,
+  "run_duration_seconds": 2.05,
   "symbol": "🌧️",
-  "composite_score": 66,
-  "composite_raw": 66.75,
-  "composite_weighted": 61.0,
-  "storm_floor": 66.75,
+  "composite_score": 68,
+  "composite_raw": 68.25,
+  "composite_weighted": 61.4,
+  "storm_floor": 68.25,
   "storm_floor_active": true,
   "storm_driver": "crypto_leverage",
-  "display_score": 66,
+  "display_score": 68,
   "status": "SQUALL / DOWNPOUR",
   "desc": "Elevated friction: notable divergence in equity volatility, crypto leverage or liquidity plumbing.",
   "color": "#ff6600",
@@ -79,7 +79,7 @@
     "grid_bots": {
       "status": "PAUSED",
       "color": "#ff0033",
-      "action": "Dislocation risk elevated (overall 66.8, vol 72, crypto 89). Reference: pause new grid bids.",
+      "action": "Dislocation risk elevated (overall 68.2, vol 72, crypto 91). Reference: pause new grid bids.",
       "hysteresis": false,
       "confirmed_runs": 0
     },
@@ -91,7 +91,7 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Neutral baseline funding (+8.6% APR)."
+      "action": "Moderate derivatives bias (+7.5% APR)."
     },
     "dark_pool": {
       "status": "HIGH",
@@ -114,14 +114,14 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 89,
-      "btc_funding_apr": 8.6,
-      "btc_oi_mil": 2019.5,
-      "btc_24h_change_pct": -9.14,
-      "dvol_index": 67.7,
-      "funding_stress": 10,
-      "dvol_stress": 67,
-      "price_shock_stress": 89,
+      "score": 91,
+      "btc_funding_apr": 7.5,
+      "btc_oi_mil": 2005.2,
+      "btc_24h_change_pct": -9.31,
+      "dvol_index": 64.7,
+      "funding_stress": 12,
+      "dvol_stress": 59,
+      "price_shock_stress": 91,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -169,14 +169,14 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 89,
-      "btc_funding_apr": 8.6,
-      "btc_oi_mil": 2019.5,
-      "btc_24h_change_pct": -9.14,
-      "dvol_index": 67.7,
-      "funding_stress": 10,
-      "dvol_stress": 67,
-      "price_shock_stress": 89,
+      "score": 91,
+      "btc_funding_apr": 7.5,
+      "btc_oi_mil": 2005.2,
+      "btc_24h_change_pct": -9.31,
+      "dvol_index": 64.7,
+      "funding_stress": 12,
+      "dvol_stress": 59,
+      "price_shock_stress": 91,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
