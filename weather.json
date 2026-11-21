@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.7.1",
-  "timestamp": "2026-11-20 23:45 UTC",
-  "generated_at": "2026-11-20T23:45:35Z",
-  "valid_until": "2026-11-21T02:15:35Z",
+  "timestamp": "2026-11-21 00:00 UTC",
+  "generated_at": "2026-11-21T00:00:55Z",
+  "valid_until": "2026-11-21T02:30:55Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 2.88,
+  "run_duration_seconds": 3.31,
   "symbol": "🌧️",
   "composite_score": 54,
   "composite_raw": 54.0,
-  "composite_weighted": 51.4,
+  "composite_weighted": 51.1,
   "storm_floor": 54.0,
   "storm_floor_active": true,
   "storm_driver": "market_volatility",
@@ -78,7 +78,7 @@
     "grid_bots": {
       "status": "PAUSED",
       "color": "#ff0033",
-      "action": "Dislocation risk elevated (overall 54.0, vol 72, crypto 36). Reference: pause new grid bids.",
+      "action": "Dislocation risk elevated (overall 54.0, vol 72, crypto 35). Reference: pause new grid bids.",
       "hysteresis": false,
       "confirmed_runs": 0
     },
@@ -90,7 +90,7 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Moderate derivatives bias (+1.7% APR)."
+      "action": "Moderate derivatives bias (+1.9% APR)."
     },
     "dark_pool": {
       "status": "HIGH",
@@ -113,14 +113,14 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 36,
-      "btc_funding_apr": 1.7,
-      "btc_oi_mil": 2225.2,
-      "btc_24h_change_pct": -4.93,
-      "dvol_index": 52.6,
-      "funding_stress": 19,
+      "score": 35,
+      "btc_funding_apr": 1.9,
+      "btc_oi_mil": 2214.0,
+      "btc_24h_change_pct": -4.86,
+      "dvol_index": 52.5,
+      "funding_stress": 18,
       "dvol_stress": 27,
-      "price_shock_stress": 36,
+      "price_shock_stress": 35,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -150,7 +150,7 @@
       "fallback": false
     },
     "odds_and_ends": {
-      "score": 15,
+      "score": 14,
       "wiki_z": 0.4,
       "wiki_articles_ok": 4,
       "border_wait_m": 40,
@@ -168,14 +168,14 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 36,
-      "btc_funding_apr": 1.7,
-      "btc_oi_mil": 2225.2,
-      "btc_24h_change_pct": -4.93,
-      "dvol_index": 52.6,
-      "funding_stress": 19,
+      "score": 35,
+      "btc_funding_apr": 1.9,
+      "btc_oi_mil": 2214.0,
+      "btc_24h_change_pct": -4.86,
+      "dvol_index": 52.5,
+      "funding_stress": 18,
       "dvol_stress": 27,
-      "price_shock_stress": 36,
+      "price_shock_stress": 35,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -205,7 +205,7 @@
       "fallback": false
     },
     "cognitive_physical": {
-      "score": 15,
+      "score": 14,
       "wiki_z": 0.4,
       "wiki_articles_ok": 4,
       "border_wait_m": 40,
