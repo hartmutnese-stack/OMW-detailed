@@ -2,7 +2,40 @@
 # -*- coding: utf-8 -*-
 """
 OPEN MARKET WEATHER OBSERVATORY // HYBRID MACRO & CRYPTO
-Version: 3.7.2 (stdlib only)
+Version: 3.7.3 (stdlib only)
+
+Changes in 3.7.3 (on top of 3.7.2):
+  - A missing markPx/prevDayPx from Hyperliquid only switches the BTC price shock off. Before, the
+    price parse sat in the same try block as funding and open interest, so a missing price field
+    threw away good funding data and put the whole Hyperliquid feed on fallback.
+  - The middle time label of the history chart comes from the time axis. It used the middle
+    observation, which is wrong whenever the runs are unevenly spaced (GitHub delays scheduled runs).
+  - The documentation in this header is back.
+  - FRAGILITY_WIDGET is markup only. The script is fragility.js (same folder as index.html).
+
+Changes in 3.7.2:
+  - BTC price shock: a 24h drop of more than SHOCK_FREE_DROP_PCT lifts the crypto pillar, up to
+    100 at SHOCK_FULL_DROP_PCT. Only drops count. Switch off with OMW_PRICE_SHOCK=0.
+  - The storm floor uses market volatility, the crypto pillar and swap line stress (not the
+    Treasury cash part of the dollar liquidity pillar, which moves on routine tax and settlement dates).
+  - 7-day history chart and table on the dashboard, link to history.csv.
+
+Changes in 3.7.0:
+  - Storm floor: composite = max(weighted average, strongest acute input * 0.75).
+  - Equity panic trigger: market volatility score >= 65 (stay until < 58) pauses grid bots.
+  - Crypto pillar keeps at least 85 % of the stronger of funding stress and DVOL stress.
+
+Note on history.csv: the composite column is not comparable before and after 3.7.0.
+
+Optional environment variables:
+  OMW_CONTACT                  Contact for the User-Agent sent to SEC EDGAR and Wikimedia.
+  OMW_BASE_URL                 Public URL of the deployment (previous state, links).
+  OMW_REPO_URL                 Link to the repository shown on the dashboard.
+  OMW_VALID_FOR_HOURS          How long a result is valid (default 2.5).
+  OMW_STATE_MAX_AGE_HOURS      Previous state older than this is ignored (default 4).
+  OMW_RECOVERY_CONFIRMATIONS   Runs in a row needed to step the grid status down (default 2).
+  OMW_COLD_START_STATUS        Grid status assumed without a recent state (default CAUTION).
+  OMW_PRICE_SHOCK              "0" switches the BTC price shock off.
 """
 
 import csv
@@ -46,7 +79,7 @@ def env_number(name, default, cast=float, minimum=None):
     return value
 
 
-VERSION = "3.7.2"
+VERSION = "3.7.3"
 SCHEMA_VERSION = 1
 BASE_URL = os.environ.get("OMW_BASE_URL", "https://omw.hartmut-nese.workers.dev").rstrip("/")
 REPO_URL = os.environ.get("OMW_REPO_URL", "https://github.com/hartmutnese-stack/OMW-detailed")
@@ -288,11 +321,26 @@ def funding_stress(apr):
 
 
 def price_shock_stress(change_pct):
+    """Only drops count. SHOCK_FREE_DROP_PCT -> 0, SHOCK_FULL_DROP_PCT -> 100."""
     if change_pct is None:
         return 0
     drop = max(0.0, -change_pct)
     span = SHOCK_FULL_DROP_PCT - SHOCK_FREE_DROP_PCT
     return clamp(int((drop - SHOCK_FREE_DROP_PCT) * 100 / span))
+
+
+def btc_day_change(ctx):
+    """24h change in percent from markPx and prevDayPx, or None. A missing price only switches
+    the price shock off. It never invalidates funding or open interest."""
+    try:
+        mark, prev_px = float(ctx["markPx"]), float(ctx["prevDayPx"])
+    except (TypeError, KeyError, ValueError):
+        log("WARN", "HYPERLIQUID", "markPx/prevDayPx missing, BTC price shock off for this run")
+        return None
+    if mark <= 0 or prev_px <= 0:
+        log("WARN", "HYPERLIQUID", "non-positive BTC price, BTC price shock off for this run")
+        return None
+    return round((mark / prev_px - 1) * 100, 2)
 
 
 def get_crypto_leverage(feed_health):
@@ -313,13 +361,9 @@ def get_crypto_leverage(feed_health):
             ctx = ctxs[idx]
             funding = round(float(ctx["funding"]) * 24 * 365 * 100, 1)
             oi = round(float(ctx["openInterest"]) * float(ctx["oraclePx"]) / 1_000_000, 1)
-            change = None
+            funding_apr, oi_mil, hl_fallback, hl_error = funding, oi, False, None
             if PRICE_SHOCK_ENABLED:
-                mark, prev_px = float(ctx["markPx"]), float(ctx["prevDayPx"])
-                if mark <= 0 or prev_px <= 0:
-                    raise ValueError("non-positive price")
-                change = round((mark / prev_px - 1) * 100, 2)
-            funding_apr, oi_mil, btc_change, hl_fallback, hl_error = funding, oi, change, False, None
+                btc_change = btc_day_change(ctx)
         except (TypeError, KeyError, IndexError, StopIteration, ValueError, AttributeError):
             hl_error = "INVALID_RESPONSE"
             log("WARN", "HYPERLIQUID", "response not usable, using fallback funding")
@@ -1157,8 +1201,9 @@ def render_history_section(points, current_color):
     guides.append(f'<text x="{pad_l - 6}" y="{pad_t + 4}" text-anchor="end" fill="#718096" font-size="10">100</text>')
     guides.append(f'<text x="{pad_l - 6}" y="{pad_t + ph}" text-anchor="end" fill="#718096" font-size="10">0</text>')
 
+    # The label in the middle belongs to the middle of the TIME axis, not to the middle observation.
     t_start = points[0]["ts"].strftime("%b %d")
-    t_mid = points[len(points) // 2]["ts"].strftime("%b %d")
+    t_mid = datetime.fromtimestamp(t0 + span / 2, timezone.utc).strftime("%b %d")
     t_end = points[-1]["ts"].strftime("%b %d %H:%M UTC")
     x_labels = (
         f'<text x="{pad_l}" y="{h - 4}" text-anchor="start" fill="#718096" font-size="10">{t_start}</text>'
@@ -1300,6 +1345,7 @@ HTML_CSS = """
         }
 """
 
+# Markup only. The script is fragility.js (same folder as index.html), which talks to /api/fragility (worker.js).
 FRAGILITY_WIDGET = """
     <h3 style="margin-top:2.5rem;">SINGLE-STOCK FRAGILITY CHECK</h3>
     <div class="posture-card">
@@ -1307,104 +1353,22 @@ FRAGILITY_WIDGET = """
             Measures structural market tension for an equity from price and volume data (no direction, no trading signal).
         </div>
         <form id="frag-form" style="display:flex;flex-wrap:wrap;gap:0.6rem;margin-bottom:1rem;">
-            <input id="frag-sym" placeholder="Ticker (e.g. SPCX, ANT, RHM.DE)" maxlength="15" autocomplete="off" required
+            <input id="frag-sym" aria-label="Ticker symbol" placeholder="Ticker (e.g. SPCX, ANT, RHM.DE)" maxlength="15" autocomplete="off" required
                    style="background:#090b0e;color:#e2e8f0;border:1px solid #2d3748;border-radius:4px;padding:0.55rem 0.7rem;font:inherit;text-transform:uppercase;width:15.5rem;">
-            <input id="frag-off" placeholder="Offer / ref price (opt.)" inputmode="decimal" autocomplete="off"
+            <input id="frag-off" aria-label="Offer or reference price (optional)" placeholder="Offer / ref price (opt.)" inputmode="decimal" autocomplete="off"
                    style="background:#090b0e;color:#e2e8f0;border:1px solid #2d3748;border-radius:4px;padding:0.55rem 0.7rem;font:inherit;width:13.5rem;">
-            <button type="submit"
+            <button id="frag-btn" type="submit"
                     style="background:#1a202c;color:#63b3ed;border:1px solid #2d3748;border-radius:4px;padding:0.55rem 1.1rem;font:inherit;cursor:pointer;">
                 Check
             </button>
         </form>
-        <div id="frag-out"></div>
+        <div id="frag-out" role="status" aria-live="polite"></div>
         <details style="font-size:0.78rem;color:#718096;margin-top:0.8rem;">
             <summary style="cursor:pointer;">How it is calculated</summary>
-            <p style="margin-top:0.4rem;">Eight factors (0–100, higher = more fragile): Volatility 25%, Upside Extension 15%, Peak Drawdown 15%, Overnight Gaps 10%, Volume Spike 10%, Liquidity 10%, History Depth 15%, Offer Price Distance 15% (optional). Young IPOs (&lt; 5 trading days) automatically fall back to 1h intraday candles. Include exchange suffixes for non-US stocks (e.g. RHM.DE for XETRA).</p>
+            <p style="margin-top:0.4rem;">Eight factors (0&ndash;100, higher = more fragile): Volatility 25%, Upside Extension 15%, Peak Drawdown 15%, Overnight Gaps 10%, Volume Spike 10%, Liquidity 10%, History Depth 15%, Offer Price Distance 15% (optional). Factors without enough data are left out. Young IPOs (&lt; 5 trading days) fall back to 1h intraday candles. Liquidity is converted to USD at approximate rates. Include exchange suffixes for non-US stocks (e.g. RHM.DE for XETRA). All scales and weights are uncalibrated estimates.</p>
         </details>
     </div>
-    <script>
-    (() => {
-      const out = document.getElementById("frag-out");
-      const form = document.getElementById("frag-form");
-      const symEl = document.getElementById("frag-sym");
-      const offEl = document.getElementById("frag-off");
-      const colors = { stable: "#00ff66", elevated: "#ffcc00", fragile: "#ff6600" };
-      const el = (tag, text, style) => {
-        const e = document.createElement(tag);
-        if (text !== undefined) e.textContent = text;
-        if (style) e.style.cssText = style;
-        return e;
-      };
-      const NUMBER = /^\\d+(\\.\\d+)?$/;
-      const cleanOffer = (v) => (v || "").trim().replace(",", ".");
-      function render(d) {
-        out.replaceChildren();
-        const col = colors[d.labelClass] || "#d1d5db";
-        out.append(el("div", `${d.symbol} · ${d.name}${d.exchange ? " · " + d.exchange : ""} · Price: ${d.price} ${d.currency || ""} · As of ${d.asOf} (${d.source})`, "color:#718096;font-size:0.8rem;margin-bottom:0.6rem;"));
-        const head = el("div", "", "display:flex;flex-wrap:wrap;align-items:baseline;gap:0.9rem;margin-bottom:0.8rem;");
-        head.append(
-          el("span", String(d.score), `font-size:2.3rem;font-weight:bold;line-height:1;color:${col};`),
-          el("span", d.label.toUpperCase(), `font-weight:bold;color:${col};`),
-          el("span", `State: ${d.regime}`, "color:#e2e8f0;font-size:0.85rem;"),
-          el("span", `Depth: ${d.quality} (${d.tradingDays}d)`, "color:#718096;font-size:0.8rem;")
-        );
-        out.append(head);
-        for (const f of d.factors) {
-          const wrap = el("div", "", "border-top:1px solid #161b22;padding:0.45rem 0;");
-          const row = el("div", "", "display:flex;justify-content:space-between;gap:0.8rem;font-size:0.85rem;");
-          const mid = el("span", f.valueText, "color:#a0aec0;flex:1;");
-          mid.title = f.explain;
-          row.append(
-            el("strong", f.label, "min-width:11.5rem;color:#cbd5e0;"),
-            mid,
-            el("span", f.score === null ? "n/a" : String(f.score), "background:#1a202c;border-radius:3px;padding:1px 8px;font-weight:bold;white-space:nowrap;")
-          );
-          wrap.append(row);
-          if (f.score !== null) {
-            const bar = el("div", "", "height:4px;background:#1a202c;border-radius:2px;margin-top:0.35rem;");
-            bar.append(el("div", "", `height:4px;background:#63b3ed;border-radius:2px;width:${Math.max(2, f.score)}%;`));
-            wrap.append(bar);
-          }
-          out.append(wrap);
-        }
-        for (const n of d.notes) out.append(el("div", n, "color:#718096;font-size:0.78rem;margin-top:0.4rem;"));
-      }
-      async function run(symbol, offer) {
-        out.replaceChildren(el("div", "Loading market data ...", "color:#a0aec0;font-size:0.85rem;"));
-        const q = new URLSearchParams({ symbol });
-        if (offer) q.set("offer", offer);
-        try {
-          const res = await fetch("/api/fragility?" + q);
-          const d = await res.json();
-          if (!res.ok) { out.replaceChildren(el("div", d.message || "Error", "color:#ff6600;font-size:0.85rem;")); return; }
-          render(d);
-        } catch {
-          out.replaceChildren(el("div", "Failed to fetch API.", "color:#ff6600;font-size:0.85rem;"));
-        }
-      }
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const s = symEl.value.trim().toUpperCase();
-        const o = cleanOffer(offEl.value);
-        if (o && !NUMBER.test(o)) {
-          out.replaceChildren(el("div", "The offer price must be a number, for example 12.5", "color:#ff6600;font-size:0.85rem;"));
-          return;
-        }
-        offEl.value = o;
-        if (s) { location.hash = s + (o ? "," + o : ""); run(s, o); }
-      });
-      let rawHash = "";
-      try { rawHash = decodeURIComponent(location.hash.slice(1)); } catch { rawHash = ""; }
-      const h = rawHash.split(",");
-      if (h[0] && /^[A-Za-z0-9.-]{1,15}$/.test(h[0])) {
-        const offer = cleanOffer(h.slice(1).join("."));
-        const validOffer = NUMBER.test(offer) ? offer : "";
-        symEl.value = h[0].toUpperCase();
-        offEl.value = validOffer;
-        run(h[0].toUpperCase(), validOffer);
-      }
-    })();
-    </script>
+    <script src="fragility.js" defer></script>
 """
 
 
