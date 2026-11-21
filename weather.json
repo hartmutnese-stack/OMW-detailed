@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.7.1",
-  "timestamp": "2026-11-21 01:30 UTC",
-  "generated_at": "2026-11-21T01:30:44Z",
-  "valid_until": "2026-11-21T04:00:44Z",
+  "timestamp": "2026-11-21 01:45 UTC",
+  "generated_at": "2026-11-21T01:45:33Z",
+  "valid_until": "2026-11-21T04:15:33Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 2.48,
+  "run_duration_seconds": 2.82,
   "symbol": "🌧️",
   "composite_score": 54,
   "composite_raw": 54.0,
-  "composite_weighted": 52.5,
+  "composite_weighted": 51.3,
   "storm_floor": 54.0,
   "storm_floor_active": true,
   "storm_driver": "market_volatility",
@@ -78,7 +78,7 @@
     "grid_bots": {
       "status": "PAUSED",
       "color": "#ff0033",
-      "action": "Dislocation risk elevated (overall 54.0, vol 72, crypto 42). Reference: pause new grid bids.",
+      "action": "Dislocation risk elevated (overall 54.0, vol 72, crypto 36). Reference: pause new grid bids.",
       "hysteresis": false,
       "confirmed_runs": 0
     },
@@ -90,7 +90,7 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Moderate derivatives bias (+0.8% APR)."
+      "action": "Moderate derivatives bias (+2.1% APR)."
     },
     "dark_pool": {
       "status": "HIGH",
@@ -113,14 +113,14 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 42,
-      "btc_funding_apr": 0.8,
-      "btc_oi_mil": 2221.6,
-      "btc_24h_change_pct": -5.38,
-      "dvol_index": 50.8,
-      "funding_stress": 20,
-      "dvol_stress": 23,
-      "price_shock_stress": 42,
+      "score": 36,
+      "btc_funding_apr": 2.1,
+      "btc_oi_mil": 2221.3,
+      "btc_24h_change_pct": -4.91,
+      "dvol_index": 50.7,
+      "funding_stress": 18,
+      "dvol_stress": 22,
+      "price_shock_stress": 36,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -168,14 +168,14 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 42,
-      "btc_funding_apr": 0.8,
-      "btc_oi_mil": 2221.6,
-      "btc_24h_change_pct": -5.38,
-      "dvol_index": 50.8,
-      "funding_stress": 20,
-      "dvol_stress": 23,
-      "price_shock_stress": 42,
+      "score": 36,
+      "btc_funding_apr": 2.1,
+      "btc_oi_mil": 2221.3,
+      "btc_24h_change_pct": -4.91,
+      "dvol_index": 50.7,
+      "funding_stress": 18,
+      "dvol_stress": 22,
+      "price_shock_stress": 36,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
