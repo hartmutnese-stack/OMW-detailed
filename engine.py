@@ -2,34 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 OPEN MARKET WEATHER OBSERVATORY // HYBRID MACRO & CRYPTO
-Version: 3.7.1 (stdlib only)
-
-Changes in 3.7.1 (on top of 3.7.0):
-  - BTC price shock: the crypto pillar now also reads the 24h price move of BTC from
-    the same Hyperliquid request (markPx against prevDayPx). A 24h drop of 2% or less
-    counts for nothing, 10% or more is the maximum, in between it is linear. Only
-    drops count. This is the part that sees a crash after it has happened: after a
-    wave of liquidations, funding falls back to its baseline and DVOL can stay low,
-    so funding and DVOL alone looked calm on a day with BTC down 7%.
-    Switch it off with OMW_PRICE_SHOCK=0.
-  - The storm floor takes the swap-line stress instead of the whole dollar liquidity
-    pillar. That pillar is mostly the Treasury cash swing, which moves by large
-    amounts around tax dates and settlements without being a stress signal. Real
-    swap line usage still counts.
-  - The JSON shows composite_weighted, storm_floor, storm_floor_active and
-    storm_driver, so you can see when the floor decided the score. history.csv still
-    logs composite_raw, which includes the floor from 3.7.0 on.
-  - The 3.7.0 notes were corrected: the floor is 75% of the strongest of the three
-    inputs, so SQUALL / DOWNPOUR (composite 50) needs one of them at 67 or more.
-    VIX 35 with MOVE near 95 gives a market pillar of 65: grid PAUSED, composite
-    about 49, SCATTERED CLOUDS.
-
-Changes in 3.7.0:
-  - Storm floor: composite = max(weighted average, 0.75 * strongest of market
-    volatility, crypto leverage and swap stress).
-  - Equity panic trigger: market_volatility >= 65 (stay until < 58) pauses grid bots.
-  - Crypto floor: the crypto score is at least 85% of the stronger of funding and
-    DVOL stress, so a funding reset after liquidations does not hide high DVOL.
+Version: 3.7.2 (stdlib only)
 """
 
 import csv
@@ -46,9 +19,6 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 
-# ==============================================================================
-# LOGGING AND CONFIG
-# ==============================================================================
 def utc_now():
     return datetime.now(timezone.utc)
 
@@ -62,7 +32,6 @@ def log(level, source, message):
 
 
 def env_number(name, default, cast=float, minimum=None):
-    """Read a number from the environment. Bad values fall back to the default."""
     raw = os.environ.get(name)
     if raw is None or not raw.strip():
         return default
@@ -77,14 +46,10 @@ def env_number(name, default, cast=float, minimum=None):
     return value
 
 
-VERSION = "3.7.1"
+VERSION = "3.7.2"
 SCHEMA_VERSION = 1
-BASE_URL = os.environ.get(
-    "OMW_BASE_URL", "https://omw.hartmut-nese.workers.dev"
-).rstrip("/")
-REPO_URL = os.environ.get(
-    "OMW_REPO_URL", "https://github.com/hartmutnese-stack/OMW-detailed"
-)
+BASE_URL = os.environ.get("OMW_BASE_URL", "https://omw.hartmut-nese.workers.dev").rstrip("/")
+REPO_URL = os.environ.get("OMW_REPO_URL", "https://github.com/hartmutnese-stack/OMW-detailed")
 CONTACT = os.environ.get("OMW_CONTACT", "admin@marktwetter.org")
 VALID_FOR_HOURS = env_number("OMW_VALID_FOR_HOURS", 2.5, float, 0.1)
 STATE_MAX_AGE_HOURS = env_number("OMW_STATE_MAX_AGE_HOURS", 4.0, float, 0.1)
@@ -99,13 +64,9 @@ COMPLIANT_HEADERS = {"User-Agent": f"MarketWeatherObservatory/{VERSION} ({CONTAC
 FUNDING_BASELINE_APR = 10.95
 SWAP_NOISE_B = 1.0
 
-# BTC 24h price shock (downside only). Up to SHOCK_FREE_DROP_PCT nothing counts,
-# at SHOCK_FULL_DROP_PCT the stress is 100, linear in between.
 PRICE_SHOCK_ENABLED = os.environ.get("OMW_PRICE_SHOCK", "1").strip() != "0"
 SHOCK_FREE_DROP_PCT = 2.0
 SHOCK_FULL_DROP_PCT = 10.0
-
-# The composite is at least this share of the strongest acute pillar.
 STORM_FLOOR_FACTOR = 0.75
 
 PAUSE_ENTER = 65.0
@@ -118,9 +79,7 @@ GRID_COLORS = {"ACTIVE": "#00ff66", "CAUTION": "#ffcc00", "PAUSED": "#ff0033"}
 _cold = os.environ.get("OMW_COLD_START_STATUS", "CAUTION").strip().upper()
 COLD_START_STATUS = _cold if _cold in GRID_SEVERITY else "CAUTION"
 
-# Allow 5 days for FINRA to cover 3-day US holiday weekends plus UTC rollover
 MAX_AGE_DAYS = {"yahoo": 5, "finra": 5, "tga": 6}
-
 WIKI_MIN_BASELINE_AVG = 20.0
 WIKI_MIN_BASELINE_DAYS = 18
 WIKI_MIN_RECENT_DAYS = 5
@@ -242,12 +201,7 @@ def fetch_json(url, source, timeout=10, headers=None, data=None, retries=1):
                         last = FetchResult(status_code=status, error_type="INVALID_JSON",
                                            error_message=str(exc))
         except urllib.error.HTTPError as exc:
-            if exc.code == 429:
-                err = "HTTP_429"
-            elif exc.code >= 500:
-                err = "HTTP_5XX"
-            else:
-                err = f"HTTP_{exc.code}"
+            err = "HTTP_429" if exc.code == 429 else ("HTTP_5XX" if exc.code >= 500 else f"HTTP_{exc.code}")
             last = FetchResult(status_code=exc.code, error_type=err, error_message=str(exc))
             if exc.code < 500 and exc.code != 429:
                 break
@@ -275,7 +229,7 @@ def health(status="OK", error_type=None, detail=None):
 
 
 # ==============================================================================
-# PILLAR 1: MARKET VOLATILITY (VIX & MOVE)
+# PILLARS
 # ==============================================================================
 def yahoo_last_price(ticker):
     url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=5d"
@@ -295,7 +249,6 @@ def yahoo_last_price(ticker):
 def get_market_volatility(feed_health):
     vix, vix_err, vix_age = yahoo_last_price("%5EVIX")
     move, move_err, move_age = yahoo_last_price("%5EMOVE")
-    # Track per-quote fallbacks separately so history.csv keeps valid values on partial outages
     vix_fallback = vix is None
     move_fallback = move is None
     fallback = vix_fallback or move_fallback
@@ -327,9 +280,6 @@ def get_market_volatility(feed_health):
     }
 
 
-# ==============================================================================
-# PILLAR 2: CRYPTO LEVERAGE (HYPERLIQUID FUNDING, 24H PRICE & DERIBIT DVOL)
-# ==============================================================================
 def funding_stress(apr):
     dev = apr - FUNDING_BASELINE_APR
     limit, steep = (14.0, 3.0) if dev >= 0 else (18.0, 3.5)
@@ -338,7 +288,6 @@ def funding_stress(apr):
 
 
 def price_shock_stress(change_pct):
-    """Stress from a 24h BTC price move. Only drops count: 2% -> 0, 6.6% -> 57, 10% -> 100."""
     if change_pct is None:
         return 0
     drop = max(0.0, -change_pct)
@@ -392,7 +341,6 @@ def get_crypto_leverage(feed_health):
     f_stress = funding_stress(funding_apr)
     v_stress = clamp(int((dvol - 42.0) * (100 / 38)))
     shock = price_shock_stress(btc_change)
-    # Blend, but never below 85% of the stronger of funding and DVOL, and never below the price shock
     crypto_score = max(int(f_stress * 0.6 + v_stress * 0.4), int(max(f_stress, v_stress) * 0.85), shock)
     return {
         "score": crypto_score,
@@ -409,9 +357,6 @@ def get_crypto_leverage(feed_health):
     }
 
 
-# ==============================================================================
-# PILLAR 3: SHORT VOLUME (FINRA REG SHO, SPY)
-# ==============================================================================
 def short_volume_score(ratio):
     return clamp(int((ratio - 46.4) * 5))
 
@@ -443,7 +388,6 @@ def finra_spy_ratio(date_str):
 def get_short_volume(feed_health):
     today = utc_now()
     consecutive_errors = 0
-    # Check up to 7 days back so holiday weekends still resolve cleanly
     for i in range(8):
         day = today - timedelta(days=i)
         date_str = day.strftime("%Y%m%d")
@@ -455,9 +399,8 @@ def get_short_volume(feed_health):
             continue
         consecutive_errors = 0
         if ratio is not None:
-            age = i
-            if age > MAX_AGE_DAYS["finra"]:
-                feed_health["finra"] = health("STALE", None, f"newest file is {age} days old")
+            if i > MAX_AGE_DAYS["finra"]:
+                feed_health["finra"] = health("STALE", None, f"newest file is {i} days old")
             else:
                 feed_health["finra"] = health("OK")
             return {
@@ -477,9 +420,6 @@ def get_short_volume(feed_health):
     }
 
 
-# ==============================================================================
-# PILLAR 4: DOLLAR LIQUIDITY (TREASURY GENERAL ACCOUNT & NY FED SWAP LINES)
-# ==============================================================================
 def get_dollar_liquidity(feed_health):
     tga_url = (
         "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/dts/"
@@ -502,14 +442,12 @@ def get_dollar_liquidity(feed_health):
         if val is None:
             continue
         rec_date = parse_date(row.get("record_date"))
-        # Deduplicate repeated dates before computing the multi-day balance delta
         if rec_date is not None:
             if rec_date in seen_dates:
                 continue
             seen_dates.add(rec_date)
         entries.append((rec_date, val))
 
-    # Ensure descending date order when record_date is available on all rows
     if entries and all(d is not None for d, _ in entries):
         entries.sort(key=lambda item: item[0], reverse=True)
 
@@ -519,7 +457,6 @@ def get_dollar_liquidity(feed_health):
     if len(entries) >= 2:
         latest_date, latest = entries[0]
         prev_date, prev = entries[min(4, len(entries) - 1)]
-        # Guard against zero-day flow if dates were missing/identical
         if latest_date is None or prev_date is None or latest_date != prev_date:
             tga_bal = latest / 1000.0
             tga_change = (latest - prev) / 1000.0
@@ -565,15 +502,11 @@ def get_dollar_liquidity(feed_health):
     }
 
 
-# ==============================================================================
-# PILLAR 5: CREDIT STRESS (SEC 8-K, ITEM 2.04, LAST 14 DAYS)
-# ==============================================================================
 def credit_score_from_count(count):
     return clamp(int((count - 6.8) * 4.4), 5, 100)
 
 
 def count_confirmed_item_204(hits):
-    """Count unique 8-K filings in the first page whose metadata explicitly lists Item 2.04."""
     if not isinstance(hits, list):
         return None
     adsh_seen = set()
@@ -622,9 +555,6 @@ def get_credit_stress(feed_health):
     }
 
 
-# ==============================================================================
-# PILLAR 6: ODDS AND ENDS (WIKIPEDIA & CBP LAREDO)
-# ==============================================================================
 WIKI_ARTICLES = [
     "Bank_run", "Credit_default_swap", "Circuit_breaker_(stock_market)",
     "Force_majeure", "Bail-in", "Insolvency",
@@ -657,24 +587,21 @@ def wikipedia_zscore(article, start, end):
     if n_days < 21:
         log("WARN", "WIKIPEDIA", f"{article}: window has only {n_days} days (needs 21)")
         return None
-    series = [by_day.get((start + timedelta(days=i)).strftime("%Y%m%d"))
-              for i in range(n_days)]
+    series = [by_day.get((start + timedelta(days=i)).strftime("%Y%m%d")) for i in range(n_days)]
     days_with_data = sum(1 for v in series if v is not None)
 
     baseline_all, recent_all = series[:-7], series[-7:]
     zero_filled_avg = sum(v or 0.0 for v in baseline_all) / len(baseline_all)
     if zero_filled_avg < WIKI_MIN_BASELINE_AVG:
         log("WARN", "WIKIPEDIA",
-            f"{article}: low traffic ({zero_filled_avg:.1f} views/day with gaps as zero, "
-            f"{days_with_data}/{n_days} days with data), skipped")
+            f"{article}: low traffic ({zero_filled_avg:.1f} views/day, {days_with_data}/{n_days} days), skipped")
         return None
 
     baseline = [v for v in baseline_all if v is not None]
     recent = [v for v in recent_all if v is not None]
     if len(baseline) < WIKI_MIN_BASELINE_DAYS or len(recent) < WIKI_MIN_RECENT_DAYS:
         log("WARN", "WIKIPEDIA",
-            f"{article}: too many gaps (baseline {len(baseline)}/{len(baseline_all)} days, "
-            f"recent {len(recent)}/7 days), skipped")
+            f"{article}: too many gaps (baseline {len(baseline)}/{len(baseline_all)}, recent {len(recent)}/7), skipped")
         return None
 
     avg_base = sum(baseline) / len(baseline)
@@ -724,9 +651,7 @@ def get_odds_and_ends(feed_health):
     if wiki_fallback:
         feed_health["wikipedia"] = health("FALLBACK", "INSUFFICIENT_DATA")
     else:
-        detail = None
-        if len(zscores) < len(WIKI_ARTICLES):
-            detail = f"{len(zscores)}/{len(WIKI_ARTICLES)} articles usable"
+        detail = f"{len(zscores)}/{len(WIKI_ARTICLES)} articles usable" if len(zscores) < len(WIKI_ARTICLES) else None
         feed_health["wikipedia"] = health("OK", None, detail)
     wiki_score = clamp(int(avg_z * 25))
 
@@ -756,7 +681,7 @@ def get_odds_and_ends(feed_health):
 
 
 # ==============================================================================
-# PREVIOUS STATE (for hysteresis)
+# STATE, QUALITY, HYSTERESIS & POSTURE
 # ==============================================================================
 def parse_ts(value):
     if not value or not isinstance(value, str):
@@ -800,9 +725,6 @@ def previous_grid_status(prev):
     return status if isinstance(status, str) and status in GRID_SEVERITY else None
 
 
-# ==============================================================================
-# DATA QUALITY
-# ==============================================================================
 def data_quality(feed_health):
     score = 100
     fallback, stale = [], []
@@ -821,9 +743,6 @@ def data_quality(feed_health):
             "stale_count": len(stale), "degraded_feeds": degraded}
 
 
-# ==============================================================================
-# GRID STATUS (level bands + run-count confirmation)
-# ==============================================================================
 def raw_grid_candidate(composite, p, clean, band_status):
     vix = p["market_volatility"]["vix"]
     mkt = p["market_volatility"]["score"]
@@ -871,7 +790,6 @@ def resolve_grid_status(candidate, prev_status, prev_transition):
 
 
 def calm_blockers(composite, vix, crypto_score, band):
-    """Return human-readable reasons preventing an ACTIVE status under the given band."""
     blockers = []
     if composite >= band["composite"]:
         blockers.append(f"overall {composite:.1f} >= {band['composite']:g}")
@@ -882,9 +800,6 @@ def calm_blockers(composite, vix, crypto_score, band):
     return blockers
 
 
-# ==============================================================================
-# TACTICAL POSTURE
-# ==============================================================================
 def generate_tactical_posture(composite, p, quality, prev):
     vix = p["market_volatility"]["vix"]
     mkt_score = p["market_volatility"]["score"]
@@ -1010,7 +925,6 @@ def generate_tactical_posture(composite, p, quality, prev):
 # MAIN ENGINE
 # ==============================================================================
 def storm_floor_inputs(pillars):
-    """The acute pillars that can set the floor: name -> score."""
     return {
         "market_volatility": pillars["market_volatility"]["score"],
         "crypto_leverage": pillars["crypto_leverage"]["score"],
@@ -1096,14 +1010,12 @@ def calculate_systemic_weather():
 
 
 # ==============================================================================
-# EXPORT
+# HISTORY & EXPORT
 # ==============================================================================
 def fb_tag(pillar_key, pillar, feed_health):
-    # Generates tag like "fallback: tga, ny fed; stale: yahoo" or ""
     parts = FALLBACK_PARTS[pillar_key]
     fallback = [feed.replace("_", " ") for flag, feed in parts if pillar.get(flag)]
-    stale = [feed.replace("_", " ") for _, feed in parts
-             if dig(feed_health, feed, "status") == "STALE"]
+    stale = [feed.replace("_", " ") for _, feed in parts if dig(feed_health, feed, "status") == "STALE"]
     tags = []
     if fallback:
         tags.append(f"fallback: {', '.join(fallback)}")
@@ -1118,12 +1030,7 @@ def pillar_rows(p, feed_health):
     funding_str = f"{cl['btc_funding_apr']:+.1f}%"
     change = cl.get("btc_24h_change_pct")
     change_str = f" | BTC 24h: {change:+.1f}%" if change is not None else ""
-    if oe["border_wait_m"] is not None:
-        border = f"{oe['border_wait_m']}m"
-    elif oe.get("border_state") == "UNKNOWN":
-        border = "unknown"
-    else:
-        border = "closed / no data"
+    border = f"{oe['border_wait_m']}m" if oe["border_wait_m"] is not None else ("unknown" if oe.get("border_state") == "UNKNOWN" else "closed / no data")
     rows = [
         ("market_volatility", "Market Volatility", "S&P 500 VIX + Treasury MOVE Index",
          f"VIX: {mv['vix']} | MOVE: {mv['move_index']}"),
@@ -1183,34 +1090,156 @@ def append_history(data):
     log("INFO", "HISTORY", f"loaded {rows_before} observations; appended observation {rows_before + 1}")
 
 
+def load_history_points(current_data, days=7):
+    cutoff = utc_now() - timedelta(days=days)
+    points = []
+    if os.path.exists(HISTORY_FILE):
+        try:
+            with open(HISTORY_FILE, "r", encoding="utf-8", newline="") as f:
+                for row in csv.DictReader(f):
+                    ts = parse_ts(row.get("timestamp"))
+                    comp = to_float(row.get("composite"))
+                    if ts is None or comp is None or ts < cutoff:
+                        continue
+                    points.append({
+                        "ts": ts, "label": row.get("timestamp", ""), "composite": comp,
+                        "vix": to_float(row.get("vix")), "btc_funding": to_float(row.get("btc_funding")),
+                        "dvol": to_float(row.get("dvol")), "spy_svr": to_float(row.get("spy_svr")),
+                    })
+        except Exception as exc:
+            log("WARN", "HISTORY", f"could not read {HISTORY_FILE} for chart: {exc}")
+
+    p = current_data["pillars"]
+    cur_ts = parse_ts(current_data.get("generated_at") or current_data.get("timestamp")) or utc_now()
+    if not points or points[-1]["ts"] < cur_ts:
+        points.append({
+            "ts": cur_ts, "label": current_data["timestamp"],
+            "composite": float(current_data["composite_raw"]),
+            "vix": None if p["market_volatility"].get("vix_fallback") else p["market_volatility"]["vix"],
+            "btc_funding": None if p["crypto_leverage"].get("hl_fallback") else p["crypto_leverage"]["btc_funding_apr"],
+            "dvol": None if p["crypto_leverage"].get("dvol_fallback") else p["crypto_leverage"]["dvol_index"],
+            "spy_svr": None if p["short_volume"].get("fallback") else p["short_volume"]["spy_short_volume_ratio"],
+        })
+    points.sort(key=lambda x: x["ts"])
+    return points
+
+
+def render_history_section(points, current_color):
+    if len(points) < 2:
+        return """
+    <h3 style="margin-top:2.5rem;">RECENT HISTORY (7D)</h3>
+    <div class="posture-card">
+        <div class="badge-sub">Collecting observations in <code>history.csv</code>. Trend chart appears after 2+ runs.</div>
+    </div>"""
+
+    w, h = 840, 175
+    pad_l, pad_r, pad_t, pad_b = 34, 14, 14, 24
+    pw, ph = w - pad_l - pad_r, h - pad_t - pad_b
+    t0 = points[0]["ts"].timestamp()
+    span = max(1.0, points[-1]["ts"].timestamp() - t0)
+
+    coords = [
+        (round(pad_l + ((pt["ts"].timestamp() - t0) / span) * pw, 1),
+         round(pad_t + (1.0 - clamp(pt["composite"]) / 100.0) * ph, 1))
+        for pt in points
+    ]
+    line_pts = " ".join(f"{x},{y}" for x, y in coords)
+    area_pts = f"{coords[0][0]},{pad_t + ph} {line_pts} {coords[-1][0]},{pad_t + ph}"
+
+    guides = []
+    for lvl, col, lbl in ((75, "#ff0033", "75"), (50, "#ff6600", "50"), (25, "#00ff66", "25")):
+        gy = round(pad_t + (1.0 - lvl / 100.0) * ph, 1)
+        guides.append(
+            f'<line x1="{pad_l}" y1="{gy}" x2="{w - pad_r}" y2="{gy}" '
+            f'stroke="{col}" stroke-opacity="0.35" stroke-dasharray="4 4"/>'
+            f'<text x="{pad_l - 6}" y="{gy + 3}" text-anchor="end" fill="#718096" font-size="10">{lbl}</text>'
+        )
+    guides.append(f'<text x="{pad_l - 6}" y="{pad_t + 4}" text-anchor="end" fill="#718096" font-size="10">100</text>')
+    guides.append(f'<text x="{pad_l - 6}" y="{pad_t + ph}" text-anchor="end" fill="#718096" font-size="10">0</text>')
+
+    t_start = points[0]["ts"].strftime("%b %d")
+    t_mid = points[len(points) // 2]["ts"].strftime("%b %d")
+    t_end = points[-1]["ts"].strftime("%b %d %H:%M UTC")
+    x_labels = (
+        f'<text x="{pad_l}" y="{h - 4}" text-anchor="start" fill="#718096" font-size="10">{t_start}</text>'
+        f'<text x="{pad_l + pw / 2:.1f}" y="{h - 4}" text-anchor="middle" fill="#718096" font-size="10">{t_mid}</text>'
+        f'<text x="{w - pad_r}" y="{h - 4}" text-anchor="end" fill="#718096" font-size="10">{t_end}</text>'
+    )
+
+    scores = [pt["composite"] for pt in points]
+    low_s, high_s = min(scores), max(scores)
+    last_x, last_y = coords[-1]
+    svg = (
+        f'<svg viewBox="0 0 {w} {h}" style="width:100%;height:auto;display:block;font-family:monospace;">'
+        f'<defs><linearGradient id="omw-grad" x1="0" y1="0" x2="0" y2="1">'
+        f'<stop offset="0%" stop-color="{current_color}" stop-opacity="0.28"/>'
+        f'<stop offset="100%" stop-color="{current_color}" stop-opacity="0.02"/></linearGradient></defs>'
+        f'{"".join(guides)}{x_labels}'
+        f'<polygon points="{area_pts}" fill="url(#omw-grad)"/>'
+        f'<polyline fill="none" stroke="{current_color}" stroke-width="2" points="{line_pts}"/>'
+        f'<circle cx="{last_x}" cy="{last_y}" r="4" fill="{current_color}"/></svg>'
+    )
+
+    step = max(1, (len(points) - 1) // 5)
+    picks = points[::step]
+    if picks[-1] is not points[-1]:
+        picks.append(points[-1])
+    picks = list(reversed(picks[-6:]))
+
+    def fmt_opt(v, suf=""):
+        return f"{v}{suf}" if v is not None else "n/a"
+
+    def fmt_fund(v):
+        return f"{v:+.1f}%" if v is not None else "n/a"
+
+    rows_str = []
+    for pt in picks:
+        lbl = html_lib.escape(pt["label"])
+        comp = f"{pt['composite']:.1f}"
+        rows_str.append(
+            f'<tr><td>{lbl}</td><td><span class="score-pill">{comp}</span></td>'
+            f'<td>{fmt_opt(pt["vix"])}</td><td>{fmt_fund(pt["btc_funding"])}</td>'
+            f'<td>{fmt_opt(pt["dvol"], "%")}</td><td>{fmt_opt(pt["spy_svr"], "%")}</td></tr>'
+        )
+    snap_rows = "".join(rows_str)
+
+    return f"""
+    <h3 style="margin-top:2.5rem;">RECENT HISTORY (7D)</h3>
+    <div class="posture-card">
+        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:0.6rem;margin-bottom:0.8rem;font-size:0.8rem;color:#9ca3af;">
+            <span>Observations: <strong style="color:#e2e8f0;">{len(points)}</strong></span>
+            <span>7D Range: <strong style="color:#e2e8f0;">{low_s:.1f} – {high_s:.1f}</strong></span>
+            <span><a href="history.csv">[Download history.csv]</a></span>
+        </div>
+        {svg}
+        <div class="table-container" style="margin-top:1rem;">
+            <table class="table" style="min-width:520px;font-size:0.8rem;">
+                <thead><tr><th>Timestamp</th><th>Score</th><th>VIX</th><th>BTC Funding</th><th>DVOL</th><th>SPY Short</th></tr></thead>
+                <tbody>{snap_rows}</tbody>
+            </table>
+        </div>
+    </div>"""
+
+
 def render_text(data, rows):
     t = data["tactical_posture"]
     q = data["data_quality"]
     lines = [
-        "",
-        "=" * 70,
+        "", "=" * 70,
         f" OPEN MARKET WEATHER OBSERVATORY // HYBRID MACRO & CRYPTO // v{data['version']}",
         f" {data['timestamp']} // {data['run_status']} // VALID UNTIL {data['valid_until']}",
-        "=" * 70,
-        "",
+        "=" * 70, "",
         " SCOPE: Experimental rule-based macro regime observer.",
-        " NOTICE: Purely heuristic. Not an investment signal, solicitation, or advice.",
-        "",
+        " NOTICE: Purely heuristic. Not an investment signal, solicitation, or advice.", "",
         f" OVERALL STATUS : {data['status']} [Score: {data['composite_score']}/100]",
     ]
     if data.get("storm_floor_active"):
         lines.append(f" STORM FLOOR    : active, set by {data['storm_driver']} "
                      f"(weighted {data['composite_weighted']}, floor {data['storm_floor']})")
-    lines += [
-        f" DATA QUALITY   : {q['status']} [{q['score']}/100]",
-    ]
+    lines.append(f" DATA QUALITY   : {q['status']} [{q['score']}/100]")
     if q["degraded_feeds"]:
         lines.append(f" DEGRADED FEEDS : {', '.join(q['degraded_feeds'])}")
-    lines += [
-        f" CURRENT REGIME : {data['desc']}",
-        "",
-        " --- OPERATIONAL POSTURE (RULE-BASED REFERENCE HEURISTICS) ---",
-    ]
+    lines += [f" CURRENT REGIME : {data['desc']}", "", " --- OPERATIONAL POSTURE (RULE-BASED REFERENCE HEURISTICS) ---"]
     for label, key in (("GRID BOTS", "grid_bots"), ("DIP BUYING", "dip_buying"),
                        ("CRYPTO PERPS", "crypto_perps"), ("SHORT VOLUME", "dark_pool"),
                        ("COLLATERAL", "collateral")):
@@ -1219,77 +1248,55 @@ def render_text(data, rows):
     for i, (key, title, feed, values, score, fb) in enumerate(rows, 1):
         tag = f" [{fb}]" if fb else ""
         lines.append(f" [{i}] {title:<18}: Score {score}/100 ({values}){tag}")
-    lines += [
-        "",
-        f" API: curl -sL {BASE_URL}/weather.json",
-        f" REPO: {REPO_URL}",
-        "=" * 70,
-        "",
-    ]
+    lines += ["", f" API: curl -sL {BASE_URL}/weather.json", f" REPO: {REPO_URL}", "=" * 70, ""]
     return "\n".join(lines)
 
 
 def render_badge(data):
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="160" height="20">
     <mask id="a"><rect width="160" height="20" rx="3" fill="#fff"/></mask>
-    <g mask="url(#a)">
-        <path fill="#222" d="M0 0h95v20H0z"/>
-        <path fill="{data['color']}" d="M95 0h65v20H95z"/>
-    </g>
+    <g mask="url(#a)"><path fill="#222" d="M0 0h95v20H0z"/><path fill="{data['color']}" d="M95 0h65v20H95z"/></g>
     <g fill="#fff" text-anchor="middle" font-family="monospace" font-size="11">
         <text x="47" y="14">MarketWeather</text>
         <text x="127" y="14" fill="#000" font-weight="bold">{data['composite_score']}/100</text>
-    </g>
-</svg>"""
+    </g></svg>"""
 
 
 HTML_CSS = """
         * { box-sizing: border-box; }
-        body {
-            background: #090b0e;
-            color: #d1d5db;
-            font-family: 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
-            padding: 1.5rem 1rem;
-            max-width: 920px;
-            margin: auto;
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-        }
-        .header { border-bottom: 1px dashed #2d3748; padding-bottom: 1rem; margin-bottom: 1.5rem; }
-        .header-links { margin-top: 0.8rem; font-size: 0.9rem; word-break: break-all; }
-        .badge-sub { color: #718096; font-size: 0.8rem; }
-        .scope-notice { color: #a0aec0; font-size: 0.8rem; margin-top: 0.3rem; }
-        .status-box { border: 2px solid __COLOR__; background: #111419; padding: 1.5rem 1rem; margin-bottom: 2rem; text-align: center; border-radius: 4px; }
-        .status-symbol { font-size: 3.8rem; line-height: 1; margin-bottom: 0.6rem; display: block; }
-        .status-title { font-size: 1.5rem; color: __COLOR__; margin: 0 0 0.5rem 0; font-weight: bold; }
-        .status-desc { color: #9ca3af; font-size: 0.95rem; max-width: 650px; margin: auto; }
-        .storm-note { margin-top: 0.8rem; font-size: 0.8rem; color: #f59e0b; }
-        .quality { margin-top: 0.8rem; font-size: 0.85rem; font-weight: bold; }
-        .q-high { color: #00ff66; }
-        .q-medium { color: #ffcc00; }
-        .q-low { color: #ff6600; }
-        .posture-card { border: 1px solid #2d3748; background: #0d1117; padding: 1.25rem; margin-bottom: 2rem; border-radius: 4px; }
-        .posture-title { font-size: 0.9rem; font-weight: bold; color: #e2e8f0; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px dashed #2d3748; padding-bottom: 0.5rem; margin-bottom: 0.75rem; }
-        .posture-item { display: flex; justify-content: space-between; align-items: baseline; padding: 0.5rem 0; border-bottom: 1px solid #161b22; font-size: 0.9rem; }
-        .posture-item:last-child { border-bottom: none; }
-        .posture-label { font-weight: bold; color: #a0aec0; width: 140px; flex-shrink: 0; }
-        .posture-status { font-weight: bold; width: 150px; flex-shrink: 0; }
-        .posture-action { color: #cbd5e0; flex: 1; text-align: right; }
-        .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 1rem; border: 1px solid #1a202c; border-radius: 4px; }
-        .table { width: 100%; border-collapse: collapse; min-width: 640px; }
-        .table td, .table th { padding: 0.75rem 0.6rem; text-align: left; border-bottom: 1px solid #1a202c; }
-        .table th { color: #718096; font-size: 0.8rem; text-transform: uppercase; background: #0d1117; }
-        a { color: #63b3ed; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        .footer { margin-top: 2.5rem; border-top: 1px dashed #2d3748; padding-top: 1rem; font-size: 0.75rem; color: #718096; line-height: 1.6; }
-        .score-pill { font-weight: bold; padding: 2px 8px; border-radius: 3px; background: #1a202c; white-space: nowrap; }
-        .tag-fallback { color: #f59e0b; font-size: 0.75rem; margin-left: 6px; font-weight: normal; }
-        code { background: #1a202c; padding: 2px 6px; border-radius: 3px; color: #e2e8f0; }
+        body { background:#090b0e; color:#d1d5db; font-family:'SF Mono',Consolas,'Liberation Mono',Menlo,monospace; padding:1.5rem 1rem; max-width:920px; margin:auto; line-height:1.5; -webkit-font-smoothing:antialiased; }
+        .header { border-bottom:1px dashed #2d3748; padding-bottom:1rem; margin-bottom:1.5rem; }
+        .header-links { margin-top:0.8rem; font-size:0.9rem; word-break:break-all; }
+        .badge-sub { color:#718096; font-size:0.8rem; }
+        .scope-notice { color:#a0aec0; font-size:0.8rem; margin-top:0.3rem; }
+        .status-box { border:2px solid __COLOR__; background:#111419; padding:1.5rem 1rem; margin-bottom:2rem; text-align:center; border-radius:4px; }
+        .status-symbol { font-size:3.8rem; line-height:1; margin-bottom:0.6rem; display:block; }
+        .status-title { font-size:1.5rem; color:__COLOR__; margin:0 0 0.5rem 0; font-weight:bold; }
+        .status-desc { color:#9ca3af; font-size:0.95rem; max-width:650px; margin:auto; }
+        .storm-note { margin-top:0.8rem; font-size:0.8rem; color:#f59e0b; }
+        .quality { margin-top:0.8rem; font-size:0.85rem; font-weight:bold; }
+        .q-high { color:#00ff66; } .q-medium { color:#ffcc00; } .q-low { color:#ff6600; }
+        .posture-card { border:1px solid #2d3748; background:#0d1117; padding:1.25rem; margin-bottom:2rem; border-radius:4px; }
+        .posture-title { font-size:0.9rem; font-weight:bold; color:#e2e8f0; text-transform:uppercase; letter-spacing:1px; border-bottom:1px dashed #2d3748; padding-bottom:0.5rem; margin-bottom:0.75rem; }
+        .posture-item { display:flex; justify-content:space-between; align-items:baseline; padding:0.5rem 0; border-bottom:1px solid #161b22; font-size:0.9rem; }
+        .posture-item:last-child { border-bottom:none; }
+        .posture-label { font-weight:bold; color:#a0aec0; width:140px; flex-shrink:0; }
+        .posture-status { font-weight:bold; width:150px; flex-shrink:0; }
+        .posture-action { color:#cbd5e0; flex:1; text-align:right; }
+        .table-container { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; margin-top:1rem; border:1px solid #1a202c; border-radius:4px; }
+        .table { width:100%; border-collapse:collapse; min-width:640px; }
+        .table td, .table th { padding:0.75rem 0.6rem; text-align:left; border-bottom:1px solid #1a202c; }
+        .table th { color:#718096; font-size:0.8rem; text-transform:uppercase; background:#0d1117; }
+        a { color:#63b3ed; text-decoration:none; } a:hover { text-decoration:underline; }
+        .footer { margin-top:2.5rem; border-top:1px dashed #2d3748; padding-top:1rem; font-size:0.75rem; color:#718096; line-height:1.6; }
+        .score-pill { font-weight:bold; padding:2px 8px; border-radius:3px; background:#1a202c; white-space:nowrap; }
+        .tag-fallback { color:#f59e0b; font-size:0.75rem; margin-left:6px; font-weight:normal; }
+        code { background:#1a202c; padding:2px 6px; border-radius:3px; color:#e2e8f0; }
         @media (max-width: 640px) {
-            body { padding: 1rem 0.75rem; }
-            .posture-item { flex-direction: column; align-items: flex-start; gap: 4px; padding: 0.6rem 0; }
-            .posture-label, .posture-status { width: 100%; }
-            .posture-action { text-align: left; font-size: 0.85rem; color: #a0aec0; }
+            body { padding:1rem 0.75rem; }
+            .posture-item { flex-direction:column; align-items:flex-start; gap:4px; padding:0.6rem 0; }
+            .posture-label, .posture-status { width:100%; }
+            .posture-action { text-align:left; font-size:0.85rem; color:#a0aec0; }
         }
 """
 
@@ -1387,11 +1394,7 @@ FRAGILITY_WIDGET = """
         if (s) { location.hash = s + (o ? "," + o : ""); run(s, o); }
       });
       let rawHash = "";
-      try {
-        rawHash = decodeURIComponent(location.hash.slice(1));
-      } catch {
-        rawHash = "";
-      }
+      try { rawHash = decodeURIComponent(location.hash.slice(1)); } catch { rawHash = ""; }
       const h = rawHash.split(",");
       if (h[0] && /^[A-Za-z0-9.-]{1,15}$/.test(h[0])) {
         const offer = cleanOffer(h.slice(1).join("."));
@@ -1422,6 +1425,7 @@ def render_html(data, rows):
     if data.get("storm_floor_active"):
         storm_note = (f'<div class="storm-note">Storm floor active: {esc(str(data["storm_driver"]))} sets the score '
                       f'(weighted average {data["composite_weighted"]}, floor {data["storm_floor"]})</div>')
+    hist_html = render_history_section(load_history_points(data), data["color"])
 
     posture_html = "".join(
         f"""
@@ -1464,6 +1468,7 @@ def render_html(data, rows):
             <a href="weather.json">[Raw JSON API]</a> &nbsp;|&nbsp;
             <a href="weather.txt">[Plaintext for cURL]</a> &nbsp;|&nbsp;
             <a href="badge.svg">[Live SVG Badge]</a> &nbsp;|&nbsp;
+            <a href="history.csv">[History CSV]</a> &nbsp;|&nbsp;
             <a href="{esc(REPO_URL)}" target="_blank" rel="noopener">[GitHub Repository]</a>
         </div>
     </div>
@@ -1489,6 +1494,7 @@ def render_html(data, rows):
             </tbody>
         </table>
     </div>
+    {hist_html}
     {FRAGILITY_WIDGET}
     <div class="footer">
         Open market metrics. Built with Python stdlib on Cloudflare and GitHub Actions.<br>
@@ -1501,7 +1507,6 @@ def render_html(data, rows):
 
 
 def atomic_write(path, content):
-    """Write via temp file + os.replace so readers never see a half-written file."""
     directory = os.path.dirname(os.path.abspath(path)) or "."
     try:
         mode = os.stat(path).st_mode & 0o777
