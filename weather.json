@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-22 17:30 UTC",
-  "generated_at": "2026-11-22T17:30:43Z",
-  "valid_until": "2026-11-22T20:00:43Z",
-  "run_status": "COMPLETE",
-  "run_duration_seconds": 3.53,
+  "timestamp": "2026-11-22 17:45 UTC",
+  "generated_at": "2026-11-22T17:45:33Z",
+  "valid_until": "2026-11-22T20:15:33Z",
+  "run_status": "DEGRADED",
+  "run_duration_seconds": 4.43,
   "symbol": "🌧️",
   "composite_score": 54,
   "composite_raw": 54.0,
@@ -19,10 +19,12 @@
   "color": "#ff6600",
   "data_quality": {
     "status": "HIGH",
-    "score": 100,
-    "fallback_count": 0,
+    "score": 95,
+    "fallback_count": 1,
     "stale_count": 0,
-    "degraded_feeds": []
+    "degraded_feeds": [
+      "cbp"
+    ]
   },
   "fallback_flags": {
     "market_volatility": false,
@@ -30,7 +32,7 @@
     "short_volume": false,
     "dollar_liquidity": false,
     "credit_stress": false,
-    "odds_and_ends": false
+    "odds_and_ends": true
   },
   "feed_health": {
     "yahoo": {
@@ -59,7 +61,8 @@
       "detail": "4/6 articles usable"
     },
     "cbp": {
-      "status": "OK"
+      "status": "FALLBACK",
+      "error_type": "HTTP_5XX"
     }
   },
   "transition": {
@@ -72,7 +75,7 @@
     "recovery_target": null,
     "status_changed": false,
     "market_status": "PAUSED",
-    "clean_runs": 2
+    "clean_runs": 0
   },
   "tactical_posture": {
     "grid_bots": {
@@ -90,7 +93,7 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Moderate derivatives bias (-3.9% APR)."
+      "action": "Moderate derivatives bias (-4.2% APR)."
     },
     "dark_pool": {
       "status": "HIGH",
@@ -114,11 +117,11 @@
     },
     "crypto_leverage": {
       "score": 31,
-      "btc_funding_apr": -3.9,
-      "btc_oi_mil": 2476.3,
-      "btc_24h_change_pct": 0.94,
-      "dvol_index": 56.2,
-      "funding_stress": 25,
+      "btc_funding_apr": -4.2,
+      "btc_oi_mil": 2473.9,
+      "btc_24h_change_pct": 1.34,
+      "dvol_index": 56.1,
+      "funding_stress": 26,
       "dvol_stress": 37,
       "price_shock_stress": 0,
       "fallback": false,
@@ -153,11 +156,11 @@
       "score": 4,
       "wiki_z": 0.35,
       "wiki_articles_ok": 4,
-      "border_wait_m": 15,
-      "border_state": "OBSERVED",
-      "fallback": false,
+      "border_wait_m": null,
+      "border_state": "UNKNOWN",
+      "fallback": true,
       "wiki_fallback": false,
-      "cbp_fallback": false
+      "cbp_fallback": true
     },
     "market_implied": {
       "score": 72,
@@ -169,11 +172,11 @@
     },
     "crypto_247": {
       "score": 31,
-      "btc_funding_apr": -3.9,
-      "btc_oi_mil": 2476.3,
-      "btc_24h_change_pct": 0.94,
-      "dvol_index": 56.2,
-      "funding_stress": 25,
+      "btc_funding_apr": -4.2,
+      "btc_oi_mil": 2473.9,
+      "btc_24h_change_pct": 1.34,
+      "dvol_index": 56.1,
+      "funding_stress": 26,
       "dvol_stress": 37,
       "price_shock_stress": 0,
       "fallback": false,
@@ -208,11 +211,11 @@
       "score": 4,
       "wiki_z": 0.35,
       "wiki_articles_ok": 4,
-      "border_wait_m": 15,
-      "border_state": "OBSERVED",
-      "fallback": false,
+      "border_wait_m": null,
+      "border_state": "UNKNOWN",
+      "fallback": true,
       "wiki_fallback": false,
-      "cbp_fallback": false
+      "cbp_fallback": true
     }
   }
 }

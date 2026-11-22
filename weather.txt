@@ -1,7 +1,7 @@
 
 ======================================================================
  OPEN MARKET WEATHER OBSERVATORY // HYBRID MACRO & CRYPTO // v3.7.3
- 2026-11-22 17:30 UTC // COMPLETE // VALID UNTIL 2026-11-22T20:00:43Z
+ 2026-11-22 17:45 UTC // DEGRADED // VALID UNTIL 2026-11-22T20:15:33Z
 ======================================================================
 
  SCOPE: Experimental rule-based macro regime observer.
@@ -9,23 +9,24 @@
 
  OVERALL STATUS : SQUALL / DOWNPOUR [Score: 54/100]
  STORM FLOOR    : active, set by market_volatility (weighted 49.3, floor 54.0)
- DATA QUALITY   : HIGH [100/100]
+ DATA QUALITY   : HIGH [95/100]
+ DEGRADED FEEDS : cbp
  CURRENT REGIME : Elevated friction: notable divergence in equity volatility, crypto leverage or liquidity plumbing.
 
  --- OPERATIONAL POSTURE (RULE-BASED REFERENCE HEURISTICS) ---
  [*] GRID BOTS    : PAUSED -> Dislocation risk elevated (overall 54.0, vol 72, crypto 31). Reference: pause new grid bids.
  [*] DIP BUYING   : DEFENSIVE -> Support looks fragile; falling-knife risk is elevated.
- [*] CRYPTO PERPS : NOMINAL -> Moderate derivatives bias (-3.9% APR).
+ [*] CRYPTO PERPS : NOMINAL -> Moderate derivatives bias (-4.2% APR).
  [*] SHORT VOLUME : HIGH -> High short volume share on SPY (64.2%).
  [*] COLLATERAL   : WATCH -> Swap operations quiet, but overall market friction is elevated.
 
  --- 6 PILLARS ---
  [1] Market Volatility : Score 72/100 (VIX: 35.89 | MOVE: 106.31)
- [2] Crypto Leverage   : Score 31/100 (Funding: -3.9% APR | DVOL: 56.2% | BTC 24h: +0.9%)
+ [2] Crypto Leverage   : Score 31/100 (Funding: -4.2% APR | DVOL: 56.1% | BTC 24h: +1.3%)
  [3] Short Volume      : Score 89/100 (Short ratio: 64.2% (20261120))
  [4] Dollar Liquidity  : Score 35/100 (TGA: $891.2B | Swaps: $0.0B)
  [5] Credit Stress     : Score 53/100 (Filings: 19)
- [6] Odds and Ends     : Score 4/100 (Wiki Z: +0.35σ | Border: 15m)
+ [6] Odds and Ends     : Score 4/100 (Wiki Z: +0.35σ | Border: unknown) [fallback: cbp]
 
  API: curl -sL https://omw.hartmut-nese.workers.dev/weather.json
  REPO: https://github.com/hartmutnese-stack/OMW-detailed
