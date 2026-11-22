@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-22 15:30 UTC",
-  "generated_at": "2026-11-22T15:30:46Z",
-  "valid_until": "2026-11-22T18:00:46Z",
+  "timestamp": "2026-11-22 15:45 UTC",
+  "generated_at": "2026-11-22T15:45:35Z",
+  "valid_until": "2026-11-22T18:15:35Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 2.67,
+  "run_duration_seconds": 4.6,
   "symbol": "🌧️",
   "composite_score": 54,
   "composite_raw": 54.0,
-  "composite_weighted": 48.9,
+  "composite_weighted": 49.1,
   "storm_floor": 54.0,
   "storm_floor_active": true,
   "storm_driver": "market_volatility",
@@ -59,8 +59,7 @@
       "detail": "4/6 articles usable"
     },
     "cbp": {
-      "status": "CLOSED",
-      "detail": "Laredo feed reachable; no delay value"
+      "status": "OK"
     }
   },
   "transition": {
@@ -79,7 +78,7 @@
     "grid_bots": {
       "status": "PAUSED",
       "color": "#ff0033",
-      "action": "Dislocation risk elevated (overall 54.0, vol 72, crypto 29). Reference: pause new grid bids.",
+      "action": "Dislocation risk elevated (overall 54.0, vol 72, crypto 30). Reference: pause new grid bids.",
       "hysteresis": false,
       "confirmed_runs": 0
     },
@@ -91,7 +90,7 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Moderate derivatives bias (-3.8% APR)."
+      "action": "Moderate derivatives bias (-2.6% APR)."
     },
     "dark_pool": {
       "status": "HIGH",
@@ -114,13 +113,13 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 29,
-      "btc_funding_apr": -3.8,
-      "btc_oi_mil": 2397.8,
-      "btc_24h_change_pct": 1.54,
-      "dvol_index": 55.5,
-      "funding_stress": 25,
-      "dvol_stress": 35,
+      "score": 30,
+      "btc_funding_apr": -2.6,
+      "btc_oi_mil": 2392.2,
+      "btc_24h_change_pct": 1.07,
+      "dvol_index": 55.7,
+      "funding_stress": 24,
+      "dvol_stress": 36,
       "price_shock_stress": 0,
       "fallback": false,
       "hl_fallback": false,
@@ -154,8 +153,8 @@
       "score": 4,
       "wiki_z": 0.35,
       "wiki_articles_ok": 4,
-      "border_wait_m": null,
-      "border_state": "CLOSED",
+      "border_wait_m": 15,
+      "border_state": "OBSERVED",
       "fallback": false,
       "wiki_fallback": false,
       "cbp_fallback": false
@@ -169,13 +168,13 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 29,
-      "btc_funding_apr": -3.8,
-      "btc_oi_mil": 2397.8,
-      "btc_24h_change_pct": 1.54,
-      "dvol_index": 55.5,
-      "funding_stress": 25,
-      "dvol_stress": 35,
+      "score": 30,
+      "btc_funding_apr": -2.6,
+      "btc_oi_mil": 2392.2,
+      "btc_24h_change_pct": 1.07,
+      "dvol_index": 55.7,
+      "funding_stress": 24,
+      "dvol_stress": 36,
       "price_shock_stress": 0,
       "fallback": false,
       "hl_fallback": false,
@@ -209,8 +208,8 @@
       "score": 4,
       "wiki_z": 0.35,
       "wiki_articles_ok": 4,
-      "border_wait_m": null,
-      "border_state": "CLOSED",
+      "border_wait_m": 15,
+      "border_state": "OBSERVED",
       "fallback": false,
       "wiki_fallback": false,
       "cbp_fallback": false
