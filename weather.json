@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-21 23:45 UTC",
-  "generated_at": "2026-11-21T23:45:37Z",
-  "valid_until": "2026-11-22T02:15:37Z",
+  "timestamp": "2026-11-22 00:00 UTC",
+  "generated_at": "2026-11-22T00:00:59Z",
+  "valid_until": "2026-11-22T02:30:59Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 3.01,
+  "run_duration_seconds": 1.95,
   "symbol": "🌧️",
   "composite_score": 54,
   "composite_raw": 54.0,
-  "composite_weighted": 50.2,
+  "composite_weighted": 50.1,
   "storm_floor": 54.0,
   "storm_floor_active": true,
   "storm_driver": "market_volatility",
@@ -90,7 +90,7 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Moderate derivatives bias (-3.2% APR)."
+      "action": "Moderate derivatives bias (-6.9% APR)."
     },
     "dark_pool": {
       "status": "HIGH",
@@ -114,11 +114,11 @@
     },
     "crypto_leverage": {
       "score": 35,
-      "btc_funding_apr": -3.2,
-      "btc_oi_mil": 2241.1,
-      "btc_24h_change_pct": 2.1,
-      "dvol_index": 58.1,
-      "funding_stress": 24,
+      "btc_funding_apr": -6.9,
+      "btc_oi_mil": 2239.5,
+      "btc_24h_change_pct": 2.09,
+      "dvol_index": 58.0,
+      "funding_stress": 29,
       "dvol_stress": 42,
       "price_shock_stress": 0,
       "fallback": false,
@@ -150,8 +150,8 @@
       "fallback": false
     },
     "odds_and_ends": {
-      "score": 5,
-      "wiki_z": 0.4,
+      "score": 4,
+      "wiki_z": 0.35,
       "wiki_articles_ok": 4,
       "border_wait_m": 0,
       "border_state": "OBSERVED",
@@ -169,11 +169,11 @@
     },
     "crypto_247": {
       "score": 35,
-      "btc_funding_apr": -3.2,
-      "btc_oi_mil": 2241.1,
-      "btc_24h_change_pct": 2.1,
-      "dvol_index": 58.1,
-      "funding_stress": 24,
+      "btc_funding_apr": -6.9,
+      "btc_oi_mil": 2239.5,
+      "btc_24h_change_pct": 2.09,
+      "dvol_index": 58.0,
+      "funding_stress": 29,
       "dvol_stress": 42,
       "price_shock_stress": 0,
       "fallback": false,
@@ -205,8 +205,8 @@
       "fallback": false
     },
     "cognitive_physical": {
-      "score": 5,
-      "wiki_z": 0.4,
+      "score": 4,
+      "wiki_z": 0.35,
       "wiki_articles_ok": 4,
       "border_wait_m": 0,
       "border_state": "OBSERVED",
