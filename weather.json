@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-23 12:00 UTC",
-  "generated_at": "2026-11-23T12:00:58Z",
-  "valid_until": "2026-11-23T14:30:58Z",
+  "timestamp": "2026-11-23 12:15 UTC",
+  "generated_at": "2026-11-23T12:15:36Z",
+  "valid_until": "2026-11-23T14:45:36Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 1.86,
+  "run_duration_seconds": 4.63,
   "symbol": "⛅",
   "composite_score": 45,
   "composite_raw": 45.75,
@@ -59,8 +59,7 @@
       "detail": "4/6 articles usable"
     },
     "cbp": {
-      "status": "CLOSED",
-      "detail": "Laredo feed reachable; no delay value"
+      "status": "OK"
     }
   },
   "transition": {
@@ -91,7 +90,7 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Neutral baseline funding (+10.9% APR)."
+      "action": "Neutral baseline funding (+11.0% APR)."
     },
     "dark_pool": {
       "status": "HIGH",
@@ -107,7 +106,7 @@
   "pillars": {
     "market_volatility": {
       "score": 61,
-      "vix": 29.95,
+      "vix": 30.08,
       "move_index": 106.31,
       "fallback": false,
       "vix_fallback": false,
@@ -115,10 +114,10 @@
     },
     "crypto_leverage": {
       "score": 21,
-      "btc_funding_apr": 10.9,
-      "btc_oi_mil": 2321.7,
-      "btc_24h_change_pct": 0.49,
-      "dvol_index": 51.5,
+      "btc_funding_apr": 11.0,
+      "btc_oi_mil": 2316.3,
+      "btc_24h_change_pct": 0.15,
+      "dvol_index": 51.6,
       "funding_stress": 8,
       "dvol_stress": 25,
       "price_shock_stress": 0,
@@ -154,15 +153,15 @@
       "score": 5,
       "wiki_z": 0.38,
       "wiki_articles_ok": 4,
-      "border_wait_m": null,
-      "border_state": "CLOSED",
+      "border_wait_m": 0,
+      "border_state": "OBSERVED",
       "fallback": false,
       "wiki_fallback": false,
       "cbp_fallback": false
     },
     "market_implied": {
       "score": 61,
-      "vix": 29.95,
+      "vix": 30.08,
       "move_index": 106.31,
       "fallback": false,
       "vix_fallback": false,
@@ -170,10 +169,10 @@
     },
     "crypto_247": {
       "score": 21,
-      "btc_funding_apr": 10.9,
-      "btc_oi_mil": 2321.7,
-      "btc_24h_change_pct": 0.49,
-      "dvol_index": 51.5,
+      "btc_funding_apr": 11.0,
+      "btc_oi_mil": 2316.3,
+      "btc_24h_change_pct": 0.15,
+      "dvol_index": 51.6,
       "funding_stress": 8,
       "dvol_stress": 25,
       "price_shock_stress": 0,
@@ -209,8 +208,8 @@
       "score": 5,
       "wiki_z": 0.38,
       "wiki_articles_ok": 4,
-      "border_wait_m": null,
-      "border_state": "CLOSED",
+      "border_wait_m": 0,
+      "border_state": "OBSERVED",
       "fallback": false,
       "wiki_fallback": false,
       "cbp_fallback": false
