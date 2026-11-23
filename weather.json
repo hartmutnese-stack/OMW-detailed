@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-23 14:15 UTC",
-  "generated_at": "2026-11-23T14:15:38Z",
-  "valid_until": "2026-11-23T16:45:38Z",
+  "timestamp": "2026-11-23 14:30 UTC",
+  "generated_at": "2026-11-23T14:30:48Z",
+  "valid_until": "2026-11-23T17:00:48Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 5.07,
-  "symbol": "🌧️",
-  "composite_score": 56,
-  "composite_raw": 56.25,
-  "composite_weighted": 46.8,
-  "storm_floor": 56.25,
+  "run_duration_seconds": 4.49,
+  "symbol": "⛅",
+  "composite_score": 43,
+  "composite_raw": 43.5,
+  "composite_weighted": 43.2,
+  "storm_floor": 43.5,
   "storm_floor_active": true,
   "storm_driver": "market_volatility",
-  "display_score": 56,
-  "status": "SQUALL / DOWNPOUR",
-  "desc": "Elevated friction: notable divergence in equity volatility, crypto leverage or liquidity plumbing.",
-  "color": "#ff6600",
+  "display_score": 43,
+  "status": "SCATTERED CLOUDS",
+  "desc": "Operational noise within standard ranges. No immediate systemic fracture.",
+  "color": "#ffcc00",
   "data_quality": {
     "status": "HIGH",
     "score": 100,
@@ -78,8 +78,8 @@
     "grid_bots": {
       "status": "PAUSED",
       "color": "#ff0033",
-      "action": "Dislocation risk elevated (overall 56.2, vol 75, crypto 15). Reference: pause new grid bids.",
-      "hysteresis": false,
+      "action": "Staying paused until overall, volatility, and crypto scores fall below 58.",
+      "hysteresis": true,
       "confirmed_runs": 0
     },
     "dip_buying": {
@@ -90,7 +90,7 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Neutral baseline funding (+11.0% APR)."
+      "action": "Neutral baseline funding (+10.8% APR)."
     },
     "dark_pool": {
       "status": "HIGH",
@@ -98,28 +98,28 @@
       "action": "High short volume share on SPY (64.2%)."
     },
     "collateral": {
-      "status": "WATCH",
-      "color": "#ffcc00",
-      "action": "Swap operations quiet, but overall market friction is elevated."
+      "status": "STABLE",
+      "color": "#00ff66",
+      "action": "No meaningful central bank swap operations."
     }
   },
   "pillars": {
     "market_volatility": {
-      "score": 75,
-      "vix": 35.08,
-      "move_index": 110.09,
+      "score": 58,
+      "vix": 27.49,
+      "move_index": 109.48,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 15,
-      "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2400.0,
-      "btc_24h_change_pct": 4.32,
-      "dvol_index": 49.0,
+      "score": 14,
+      "btc_funding_apr": 10.8,
+      "btc_oi_mil": 2330.3,
+      "btc_24h_change_pct": 5.33,
+      "dvol_index": 48.7,
       "funding_stress": 8,
-      "dvol_stress": 18,
+      "dvol_stress": 17,
       "price_shock_stress": 0,
       "fallback": false,
       "hl_fallback": false,
@@ -160,21 +160,21 @@
       "cbp_fallback": false
     },
     "market_implied": {
-      "score": 75,
-      "vix": 35.08,
-      "move_index": 110.09,
+      "score": 58,
+      "vix": 27.49,
+      "move_index": 109.48,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 15,
-      "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2400.0,
-      "btc_24h_change_pct": 4.32,
-      "dvol_index": 49.0,
+      "score": 14,
+      "btc_funding_apr": 10.8,
+      "btc_oi_mil": 2330.3,
+      "btc_24h_change_pct": 5.33,
+      "dvol_index": 48.7,
       "funding_stress": 8,
-      "dvol_stress": 18,
+      "dvol_stress": 17,
       "price_shock_stress": 0,
       "fallback": false,
       "hl_fallback": false,
