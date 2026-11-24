@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-23 23:45 UTC",
-  "generated_at": "2026-11-23T23:45:32Z",
-  "valid_until": "2026-11-24T02:15:32Z",
+  "timestamp": "2026-11-24 00:00 UTC",
+  "generated_at": "2026-11-24T00:00:58Z",
+  "valid_until": "2026-11-24T02:30:58Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 2.7,
+  "run_duration_seconds": 5.85,
   "symbol": "⛅",
   "composite_score": 37,
   "composite_raw": 37.5,
-  "composite_weighted": 25.85,
+  "composite_weighted": 25.35,
   "storm_floor": 37.5,
   "storm_floor_active": true,
   "storm_driver": "market_volatility",
@@ -90,7 +90,7 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Neutral baseline funding (+11.0% APR)."
+      "action": "Neutral baseline funding (+9.2% APR)."
     },
     "dark_pool": {
       "status": "NOMINAL",
@@ -114,11 +114,11 @@
     },
     "crypto_leverage": {
       "score": 22,
-      "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2283.4,
-      "btc_24h_change_pct": -0.15,
-      "dvol_index": 52.4,
-      "funding_stress": 8,
+      "btc_funding_apr": 9.2,
+      "btc_oi_mil": 2271.6,
+      "btc_24h_change_pct": -0.05,
+      "dvol_index": 52.3,
+      "funding_stress": 10,
       "dvol_stress": 27,
       "price_shock_stress": 0,
       "fallback": false,
@@ -143,15 +143,15 @@
       "swaps_fallback": false
     },
     "credit_stress": {
-      "score": 53,
-      "sec_8k_filings": 19,
-      "sec_8k_item_204": 4,
+      "score": 49,
+      "sec_8k_filings": 18,
+      "sec_8k_item_204": 3,
       "sec_8k_item_204_complete": true,
       "fallback": false
     },
     "odds_and_ends": {
-      "score": 5,
-      "wiki_z": 0.38,
+      "score": 6,
+      "wiki_z": 0.47,
       "wiki_articles_ok": 4,
       "border_wait_m": 10,
       "border_state": "OBSERVED",
@@ -169,11 +169,11 @@
     },
     "crypto_247": {
       "score": 22,
-      "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2283.4,
-      "btc_24h_change_pct": -0.15,
-      "dvol_index": 52.4,
-      "funding_stress": 8,
+      "btc_funding_apr": 9.2,
+      "btc_oi_mil": 2271.6,
+      "btc_24h_change_pct": -0.05,
+      "dvol_index": 52.3,
+      "funding_stress": 10,
       "dvol_stress": 27,
       "price_shock_stress": 0,
       "fallback": false,
@@ -198,15 +198,15 @@
       "swaps_fallback": false
     },
     "credit_statutory": {
-      "score": 53,
-      "sec_8k_filings": 19,
-      "sec_8k_item_204": 4,
+      "score": 49,
+      "sec_8k_filings": 18,
+      "sec_8k_item_204": 3,
       "sec_8k_item_204_complete": true,
       "fallback": false
     },
     "cognitive_physical": {
-      "score": 5,
-      "wiki_z": 0.38,
+      "score": 6,
+      "wiki_z": 0.47,
       "wiki_articles_ok": 4,
       "border_wait_m": 10,
       "border_state": "OBSERVED",
