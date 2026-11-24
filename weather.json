@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-24 22:15 UTC",
-  "generated_at": "2026-11-24T22:15:35Z",
-  "valid_until": "2026-11-25T00:45:35Z",
+  "timestamp": "2026-11-24 22:30 UTC",
+  "generated_at": "2026-11-24T22:30:45Z",
+  "valid_until": "2026-11-25T01:00:45Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 4.81,
+  "run_duration_seconds": 2.8,
   "symbol": "⛅",
   "composite_score": 36,
   "composite_raw": 36.75,
-  "composite_weighted": 32.55,
+  "composite_weighted": 33.9,
   "storm_floor": 36.75,
   "storm_floor_active": true,
   "storm_driver": "market_volatility",
@@ -90,12 +90,12 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Moderate derivatives bias (-3.6% APR)."
+      "action": "Moderate derivatives bias (-2.4% APR)."
     },
     "dark_pool": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Normal short volume share on SPY (41.4%)."
+      "action": "Normal short volume share on SPY (48.3%)."
     },
     "collateral": {
       "status": "STABLE",
@@ -114,21 +114,21 @@
     },
     "crypto_leverage": {
       "score": 26,
-      "btc_funding_apr": -3.6,
-      "btc_oi_mil": 2123.4,
-      "btc_24h_change_pct": -2.11,
-      "dvol_index": 53.1,
-      "funding_stress": 25,
+      "btc_funding_apr": -2.4,
+      "btc_oi_mil": 2123.5,
+      "btc_24h_change_pct": -2.01,
+      "dvol_index": 53.2,
+      "funding_stress": 24,
       "dvol_stress": 29,
-      "price_shock_stress": 1,
+      "price_shock_stress": 0,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
     },
     "short_volume": {
-      "score": 0,
-      "spy_short_volume_ratio": 41.4,
-      "report_date": "20261123",
+      "score": 9,
+      "spy_short_volume_ratio": 48.3,
+      "report_date": "20261124",
       "fallback": false
     },
     "dollar_liquidity": {
@@ -169,21 +169,21 @@
     },
     "crypto_247": {
       "score": 26,
-      "btc_funding_apr": -3.6,
-      "btc_oi_mil": 2123.4,
-      "btc_24h_change_pct": -2.11,
-      "dvol_index": 53.1,
-      "funding_stress": 25,
+      "btc_funding_apr": -2.4,
+      "btc_oi_mil": 2123.5,
+      "btc_24h_change_pct": -2.01,
+      "dvol_index": 53.2,
+      "funding_stress": 24,
       "dvol_stress": 29,
-      "price_shock_stress": 1,
+      "price_shock_stress": 0,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
     },
     "dark_pool_finra": {
-      "score": 0,
-      "spy_short_volume_ratio": 41.4,
-      "report_date": "20261123",
+      "score": 9,
+      "spy_short_volume_ratio": 48.3,
+      "report_date": "20261124",
       "fallback": false
     },
     "liquidity_plumbing": {
