@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-24 12:15 UTC",
-  "generated_at": "2026-11-24T12:15:41Z",
-  "valid_until": "2026-11-24T14:45:41Z",
+  "timestamp": "2026-11-24 12:30 UTC",
+  "generated_at": "2026-11-24T12:30:49Z",
+  "valid_until": "2026-11-24T15:00:49Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 1.93,
+  "run_duration_seconds": 3.45,
   "symbol": "⛅",
-  "composite_score": 40,
-  "composite_raw": 40.5,
+  "composite_score": 41,
+  "composite_raw": 41.25,
   "composite_weighted": 27.35,
-  "storm_floor": 40.5,
+  "storm_floor": 41.25,
   "storm_floor_active": true,
   "storm_driver": "market_volatility",
-  "display_score": 40,
+  "display_score": 41,
   "status": "SCATTERED CLOUDS",
   "desc": "Operational noise within standard ranges. No immediate systemic fracture.",
   "color": "#ffcc00",
@@ -78,7 +78,7 @@
     "grid_bots": {
       "status": "CAUTION",
       "color": "#ffcc00",
-      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (overall 40.5 >= 35, VIX 28.33 >= 20).",
+      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (overall 41.2 >= 35, VIX 28.89 >= 20).",
       "hysteresis": false,
       "confirmed_runs": 0
     },
@@ -90,7 +90,7 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Moderate derivatives bias (-4.2% APR)."
+      "action": "Moderate derivatives bias (-3.9% APR)."
     },
     "dark_pool": {
       "status": "NOMINAL",
@@ -105,20 +105,20 @@
   },
   "pillars": {
     "market_volatility": {
-      "score": 54,
-      "vix": 28.33,
+      "score": 55,
+      "vix": 28.89,
       "move_index": 100.91,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 28,
-      "btc_funding_apr": -4.2,
-      "btc_oi_mil": 2239.6,
-      "btc_24h_change_pct": -1.83,
+      "score": 27,
+      "btc_funding_apr": -3.9,
+      "btc_oi_mil": 2247.8,
+      "btc_24h_change_pct": -1.78,
       "dvol_index": 54.5,
-      "funding_stress": 26,
+      "funding_stress": 25,
       "dvol_stress": 32,
       "price_shock_stress": 0,
       "fallback": false,
@@ -160,20 +160,20 @@
       "cbp_fallback": false
     },
     "market_implied": {
-      "score": 54,
-      "vix": 28.33,
+      "score": 55,
+      "vix": 28.89,
       "move_index": 100.91,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 28,
-      "btc_funding_apr": -4.2,
-      "btc_oi_mil": 2239.6,
-      "btc_24h_change_pct": -1.83,
+      "score": 27,
+      "btc_funding_apr": -3.9,
+      "btc_oi_mil": 2247.8,
+      "btc_24h_change_pct": -1.78,
       "dvol_index": 54.5,
-      "funding_stress": 26,
+      "funding_stress": 25,
       "dvol_stress": 32,
       "price_shock_stress": 0,
       "fallback": false,
