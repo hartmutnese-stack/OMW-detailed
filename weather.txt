@@ -1,31 +1,31 @@
 
 ======================================================================
  OPEN MARKET WEATHER OBSERVATORY // HYBRID MACRO & CRYPTO // v3.7.3
- 2026-11-24 17:00 UTC // COMPLETE // VALID UNTIL 2026-11-24T19:30:58Z
+ 2026-11-24 17:15 UTC // COMPLETE // VALID UNTIL 2026-11-24T19:45:40Z
 ======================================================================
 
  SCOPE: Experimental rule-based macro regime observer.
  NOTICE: Purely heuristic. Not an investment signal, solicitation, or advice.
 
  OVERALL STATUS : SCATTERED CLOUDS [Score: 40/100]
- STORM FLOOR    : active, set by market_volatility (weighted 28.55, floor 40.5)
+ STORM FLOOR    : active, set by market_volatility (weighted 27.95, floor 40.5)
  DATA QUALITY   : HIGH [100/100]
  CURRENT REGIME : Operational noise within standard ranges. No immediate systemic fracture.
 
  --- OPERATIONAL POSTURE (RULE-BASED REFERENCE HEURISTICS) ---
- [*] GRID BOTS    : CAUTION -> Reference: wider grid bands (+15-25%), smaller sizes or leverage (overall 40.5 >= 35, VIX 28.38 >= 20).
+ [*] GRID BOTS    : CAUTION -> Reference: wider grid bands (+15-25%), smaller sizes or leverage (overall 40.5 >= 35, VIX 28.33 >= 20).
  [*] DIP BUYING   : FAVORABLE -> Orderly pullbacks. Liquidity supports absorption.
- [*] CRYPTO PERPS : NOMINAL -> Moderate derivatives bias (-2.3% APR).
+ [*] CRYPTO PERPS : NOMINAL -> Moderate derivatives bias (-4.5% APR).
  [*] SHORT VOLUME : NOMINAL -> Normal short volume share on SPY (41.4%).
  [*] COLLATERAL   : STABLE -> No meaningful central bank swap operations.
 
  --- 6 PILLARS ---
- [1] Market Volatility : Score 54/100 (VIX: 28.38 | MOVE: 100.93)
- [2] Crypto Leverage   : Score 31/100 (Funding: -2.3% APR | DVOL: 55.0% | BTC 24h: -4.5%)
+ [1] Market Volatility : Score 54/100 (VIX: 28.33 | MOVE: 100.94)
+ [2] Crypto Leverage   : Score 28/100 (Funding: -4.5% APR | DVOL: 54.4% | BTC 24h: -3.6%)
  [3] Short Volume      : Score 0/100 (Short ratio: 41.4% (20261123))
  [4] Dollar Liquidity  : Score 15/100 (TGA: $880.8B | Swaps: $0.0B)
  [5] Credit Stress     : Score 53/100 (Filings: 19)
- [6] Odds and Ends     : Score 6/100 (Wiki Z: +0.47σ | Border: 0m)
+ [6] Odds and Ends     : Score 6/100 (Wiki Z: +0.47σ | Border: 15m)
 
  API: curl -sL https://omw.hartmut-nese.workers.dev/weather.json
  REPO: https://github.com/hartmutnese-stack/OMW-detailed
