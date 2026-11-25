@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-25 07:01 UTC",
-  "generated_at": "2026-11-25T07:01:05Z",
-  "valid_until": "2026-11-25T09:31:05Z",
+  "timestamp": "2026-11-25 07:15 UTC",
+  "generated_at": "2026-11-25T07:15:34Z",
+  "valid_until": "2026-11-25T09:45:34Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 3.31,
+  "run_duration_seconds": 3.26,
   "symbol": "⛅",
   "composite_score": 36,
   "composite_raw": 36.75,
-  "composite_weighted": 28.8,
+  "composite_weighted": 28.4,
   "storm_floor": 36.75,
   "storm_floor_active": true,
   "storm_driver": "market_volatility",
@@ -91,7 +91,7 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Moderate derivatives bias (-3.3% APR)."
+      "action": "Moderate derivatives bias (+4.0% APR)."
     },
     "dark_pool": {
       "status": "NOMINAL",
@@ -114,14 +114,14 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 27,
-      "btc_funding_apr": -3.3,
-      "btc_oi_mil": 2081.1,
-      "btc_24h_change_pct": -2.12,
+      "score": 25,
+      "btc_funding_apr": 4.0,
+      "btc_oi_mil": 2081.8,
+      "btc_24h_change_pct": -1.91,
       "dvol_index": 53.4,
-      "funding_stress": 25,
+      "funding_stress": 16,
       "dvol_stress": 30,
-      "price_shock_stress": 1,
+      "price_shock_stress": 0,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -169,14 +169,14 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 27,
-      "btc_funding_apr": -3.3,
-      "btc_oi_mil": 2081.1,
-      "btc_24h_change_pct": -2.12,
+      "score": 25,
+      "btc_funding_apr": 4.0,
+      "btc_oi_mil": 2081.8,
+      "btc_24h_change_pct": -1.91,
       "dvol_index": 53.4,
-      "funding_stress": 25,
+      "funding_stress": 16,
       "dvol_stress": 30,
-      "price_shock_stress": 1,
+      "price_shock_stress": 0,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
