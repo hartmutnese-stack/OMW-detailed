@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-25 00:00 UTC",
-  "generated_at": "2026-11-25T00:00:55Z",
-  "valid_until": "2026-11-25T02:30:55Z",
-  "run_status": "DEGRADED",
-  "run_duration_seconds": 4.54,
+  "timestamp": "2026-11-25 00:04 UTC",
+  "generated_at": "2026-11-25T00:04:17Z",
+  "valid_until": "2026-11-25T02:34:17Z",
+  "run_status": "COMPLETE",
+  "run_duration_seconds": 2.34,
   "symbol": "⛅",
   "composite_score": 36,
   "composite_raw": 36.75,
-  "composite_weighted": 26.45,
+  "composite_weighted": 30.1,
   "storm_floor": 36.75,
   "storm_floor_active": true,
   "storm_driver": "market_volatility",
@@ -19,19 +19,17 @@
   "color": "#ffcc00",
   "data_quality": {
     "status": "HIGH",
-    "score": 90,
-    "fallback_count": 1,
+    "score": 100,
+    "fallback_count": 0,
     "stale_count": 0,
-    "degraded_feeds": [
-      "sec"
-    ]
+    "degraded_feeds": []
   },
   "fallback_flags": {
     "market_volatility": false,
     "crypto_leverage": false,
     "short_volume": false,
     "dollar_liquidity": false,
-    "credit_stress": true,
+    "credit_stress": false,
     "odds_and_ends": false
   },
   "feed_health": {
@@ -54,8 +52,7 @@
       "status": "OK"
     },
     "sec": {
-      "status": "FALLBACK",
-      "error_type": "HTTP_5XX"
+      "status": "OK"
     },
     "wikipedia": {
       "status": "OK",
@@ -75,25 +72,25 @@
     "recovery_target": null,
     "status_changed": false,
     "market_status": "CAUTION",
-    "clean_runs": 0
+    "clean_runs": 1
   },
   "tactical_posture": {
     "grid_bots": {
       "status": "CAUTION",
       "color": "#ffcc00",
-      "action": "Reference: wider grid bands (+15-25%). Upstream data quality is degraded.",
+      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (overall 36.8 >= 35, VIX 26.36 >= 20).",
       "hysteresis": false,
       "confirmed_runs": 0
     },
     "dip_buying": {
-      "status": "DEFENSIVE",
-      "color": "#ff6600",
-      "action": "Support looks fragile; falling-knife risk is elevated."
+      "status": "FAVORABLE",
+      "color": "#00ff66",
+      "action": "Orderly pullbacks. Liquidity supports absorption."
     },
     "crypto_perps": {
-      "status": "HEAVY SHORT",
-      "color": "#ff6600",
-      "action": "Negative perp funding (-9.2% APR). Potential short squeeze."
+      "status": "NOMINAL",
+      "color": "#00ff66",
+      "action": "Moderate derivatives bias (-6.5% APR)."
     },
     "dark_pool": {
       "status": "NOMINAL",
@@ -116,14 +113,14 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 33,
-      "btc_funding_apr": -9.2,
-      "btc_oi_mil": 2096.9,
-      "btc_24h_change_pct": -2.44,
+      "score": 28,
+      "btc_funding_apr": -6.5,
+      "btc_oi_mil": 2097.0,
+      "btc_24h_change_pct": -2.4,
       "dvol_index": 53.1,
-      "funding_stress": 37,
+      "funding_stress": 28,
       "dvol_stress": 29,
-      "price_shock_stress": 5,
+      "price_shock_stress": 4,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -146,11 +143,11 @@
       "swaps_fallback": false
     },
     "credit_stress": {
-      "score": 18,
-      "sec_8k_filings": 11,
-      "sec_8k_item_204": null,
-      "sec_8k_item_204_complete": false,
-      "fallback": true
+      "score": 49,
+      "sec_8k_filings": 18,
+      "sec_8k_item_204": 4,
+      "sec_8k_item_204_complete": true,
+      "fallback": false
     },
     "odds_and_ends": {
       "score": 14,
@@ -171,14 +168,14 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 33,
-      "btc_funding_apr": -9.2,
-      "btc_oi_mil": 2096.9,
-      "btc_24h_change_pct": -2.44,
+      "score": 28,
+      "btc_funding_apr": -6.5,
+      "btc_oi_mil": 2097.0,
+      "btc_24h_change_pct": -2.4,
       "dvol_index": 53.1,
-      "funding_stress": 37,
+      "funding_stress": 28,
       "dvol_stress": 29,
-      "price_shock_stress": 5,
+      "price_shock_stress": 4,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -201,11 +198,11 @@
       "swaps_fallback": false
     },
     "credit_statutory": {
-      "score": 18,
-      "sec_8k_filings": 11,
-      "sec_8k_item_204": null,
-      "sec_8k_item_204_complete": false,
-      "fallback": true
+      "score": 49,
+      "sec_8k_filings": 18,
+      "sec_8k_item_204": 4,
+      "sec_8k_item_204_complete": true,
+      "fallback": false
     },
     "cognitive_physical": {
       "score": 14,
