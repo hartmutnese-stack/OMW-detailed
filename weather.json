@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-25 19:31 UTC",
-  "generated_at": "2026-11-25T19:31:10Z",
-  "valid_until": "2026-11-25T22:01:10Z",
+  "timestamp": "2026-11-25 19:45 UTC",
+  "generated_at": "2026-11-25T19:45:55Z",
+  "valid_until": "2026-11-25T22:15:55Z",
   "run_status": "DEGRADED",
-  "run_duration_seconds": 27.58,
+  "run_duration_seconds": 24.34,
   "symbol": "⛅",
   "composite_score": 38,
   "composite_raw": 38.25,
-  "composite_weighted": 29.65,
+  "composite_weighted": 27.95,
   "storm_floor": 38.25,
   "storm_floor_active": true,
   "storm_driver": "market_volatility",
@@ -109,8 +109,8 @@
   "pillars": {
     "market_volatility": {
       "score": 51,
-      "vix": 27.9,
-      "move_index": 97.41,
+      "vix": 27.8,
+      "move_index": 97.45,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
@@ -118,8 +118,8 @@
     "crypto_leverage": {
       "score": 27,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2201.6,
-      "btc_24h_change_pct": 0.57,
+      "btc_oi_mil": 2188.4,
+      "btc_24h_change_pct": 0.27,
       "dvol_index": 54.5,
       "funding_stress": 8,
       "dvol_stress": 32,
@@ -153,10 +153,10 @@
       "fallback": false
     },
     "odds_and_ends": {
-      "score": 20,
+      "score": 3,
       "wiki_z": 0.24,
       "wiki_articles_ok": 4,
-      "border_wait_m": 60,
+      "border_wait_m": 10,
       "border_state": "OBSERVED",
       "fallback": false,
       "wiki_fallback": false,
@@ -164,8 +164,8 @@
     },
     "market_implied": {
       "score": 51,
-      "vix": 27.9,
-      "move_index": 97.41,
+      "vix": 27.8,
+      "move_index": 97.45,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
@@ -173,8 +173,8 @@
     "crypto_247": {
       "score": 27,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2201.6,
-      "btc_24h_change_pct": 0.57,
+      "btc_oi_mil": 2188.4,
+      "btc_24h_change_pct": 0.27,
       "dvol_index": 54.5,
       "funding_stress": 8,
       "dvol_stress": 32,
@@ -208,10 +208,10 @@
       "fallback": false
     },
     "cognitive_physical": {
-      "score": 20,
+      "score": 3,
       "wiki_z": 0.24,
       "wiki_articles_ok": 4,
-      "border_wait_m": 60,
+      "border_wait_m": 10,
       "border_state": "OBSERVED",
       "fallback": false,
       "wiki_fallback": false,
