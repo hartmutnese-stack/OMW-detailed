@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-25 03:45 UTC",
-  "generated_at": "2026-11-25T03:45:35Z",
-  "valid_until": "2026-11-25T06:15:35Z",
+  "timestamp": "2026-11-25 04:00 UTC",
+  "generated_at": "2026-11-25T04:00:52Z",
+  "valid_until": "2026-11-25T06:30:52Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 3.28,
-  "symbol": "⛅",
-  "composite_score": 36,
-  "composite_raw": 36.75,
-  "composite_weighted": 31.1,
-  "storm_floor": 36.75,
+  "run_duration_seconds": 3.08,
+  "symbol": "🌧️",
+  "composite_score": 54,
+  "composite_raw": 54.75,
+  "composite_weighted": 39.1,
+  "storm_floor": 54.75,
   "storm_floor_active": true,
-  "storm_driver": "market_volatility",
-  "display_score": 36,
-  "status": "SCATTERED CLOUDS",
-  "desc": "Operational noise within standard ranges. No immediate systemic fracture.",
-  "color": "#ffcc00",
+  "storm_driver": "crypto_leverage",
+  "display_score": 54,
+  "status": "SQUALL / DOWNPOUR",
+  "desc": "Elevated friction: notable divergence in equity volatility, crypto leverage or liquidity plumbing.",
+  "color": "#ff6600",
   "data_quality": {
     "status": "HIGH",
     "score": 100,
@@ -64,33 +64,33 @@
   },
   "transition": {
     "previous_status": "CAUTION",
-    "candidate_status": "CAUTION",
+    "candidate_status": "PAUSED",
     "required_runs": 2,
     "cold_start": false,
     "confirmed_runs": 0,
     "recovering": false,
     "recovery_target": null,
-    "status_changed": false,
-    "market_status": "CAUTION",
+    "status_changed": true,
+    "market_status": "PAUSED",
     "clean_runs": 2
   },
   "tactical_posture": {
     "grid_bots": {
-      "status": "CAUTION",
-      "color": "#ffcc00",
-      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (overall 36.8 >= 35, VIX 26.36 >= 20).",
+      "status": "PAUSED",
+      "color": "#ff0033",
+      "action": "Dislocation risk elevated (overall 54.8, vol 49, crypto 73). Reference: pause new grid bids.",
       "hysteresis": false,
       "confirmed_runs": 0
     },
     "dip_buying": {
-      "status": "FAVORABLE",
-      "color": "#00ff66",
-      "action": "Orderly pullbacks. Liquidity supports absorption."
+      "status": "DEFENSIVE",
+      "color": "#ff6600",
+      "action": "Support looks fragile; falling-knife risk is elevated."
     },
     "crypto_perps": {
       "status": "HEAVY SHORT",
       "color": "#ff6600",
-      "action": "Negative perp funding (-9.4% APR). Potential short squeeze."
+      "action": "Negative perp funding (-23.3% APR). Potential short squeeze."
     },
     "dark_pool": {
       "status": "NOMINAL",
@@ -98,9 +98,9 @@
       "action": "Normal short volume share on SPY (48.3%)."
     },
     "collateral": {
-      "status": "STABLE",
-      "color": "#00ff66",
-      "action": "No meaningful central bank swap operations."
+      "status": "WATCH",
+      "color": "#ffcc00",
+      "action": "Swap operations quiet, but overall market friction is elevated."
     }
   },
   "pillars": {
@@ -113,13 +113,13 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 33,
-      "btc_funding_apr": -9.4,
-      "btc_oi_mil": 2096.2,
-      "btc_24h_change_pct": -1.26,
-      "dvol_index": 53.0,
-      "funding_stress": 37,
-      "dvol_stress": 28,
+      "score": 73,
+      "btc_funding_apr": -23.3,
+      "btc_oi_mil": 2090.9,
+      "btc_24h_change_pct": -1.72,
+      "dvol_index": 53.1,
+      "funding_stress": 86,
+      "dvol_stress": 29,
       "price_shock_stress": 0,
       "fallback": false,
       "hl_fallback": false,
@@ -168,13 +168,13 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 33,
-      "btc_funding_apr": -9.4,
-      "btc_oi_mil": 2096.2,
-      "btc_24h_change_pct": -1.26,
-      "dvol_index": 53.0,
-      "funding_stress": 37,
-      "dvol_stress": 28,
+      "score": 73,
+      "btc_funding_apr": -23.3,
+      "btc_oi_mil": 2090.9,
+      "btc_24h_change_pct": -1.72,
+      "dvol_index": 53.1,
+      "funding_stress": 86,
+      "dvol_stress": 29,
       "price_shock_stress": 0,
       "fallback": false,
       "hl_fallback": false,
