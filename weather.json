@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-25 22:15 UTC",
-  "generated_at": "2026-11-25T22:15:57Z",
-  "valid_until": "2026-11-26T00:45:57Z",
+  "timestamp": "2026-11-25 22:31 UTC",
+  "generated_at": "2026-11-25T22:31:15Z",
+  "valid_until": "2026-11-26T01:01:15Z",
   "run_status": "DEGRADED",
-  "run_duration_seconds": 25.06,
+  "run_duration_seconds": 25.01,
   "symbol": "⛅",
   "composite_score": 39,
   "composite_raw": 39.0,
-  "composite_weighted": 28.85,
+  "composite_weighted": 27.65,
   "storm_floor": 39.0,
   "storm_floor_active": true,
   "storm_driver": "market_volatility",
@@ -98,7 +98,7 @@
     "dark_pool": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Normal short volume share on SPY (48.3%)."
+      "action": "Normal short volume share on SPY (46.7%)."
     },
     "collateral": {
       "status": "STABLE",
@@ -118,8 +118,8 @@
     "crypto_leverage": {
       "score": 22,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2256.5,
-      "btc_24h_change_pct": 0.3,
+      "btc_oi_mil": 2251.5,
+      "btc_24h_change_pct": 0.25,
       "dvol_index": 52.0,
       "funding_stress": 8,
       "dvol_stress": 26,
@@ -129,9 +129,9 @@
       "dvol_fallback": false
     },
     "short_volume": {
-      "score": 9,
-      "spy_short_volume_ratio": 48.3,
-      "report_date": "20261124",
+      "score": 1,
+      "spy_short_volume_ratio": 46.7,
+      "report_date": "20261125",
       "fallback": false
     },
     "dollar_liquidity": {
@@ -173,8 +173,8 @@
     "crypto_247": {
       "score": 22,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2256.5,
-      "btc_24h_change_pct": 0.3,
+      "btc_oi_mil": 2251.5,
+      "btc_24h_change_pct": 0.25,
       "dvol_index": 52.0,
       "funding_stress": 8,
       "dvol_stress": 26,
@@ -184,9 +184,9 @@
       "dvol_fallback": false
     },
     "dark_pool_finra": {
-      "score": 9,
-      "spy_short_volume_ratio": 48.3,
-      "report_date": "20261124",
+      "score": 1,
+      "spy_short_volume_ratio": 46.7,
+      "report_date": "20261125",
       "fallback": false
     },
     "liquidity_plumbing": {
