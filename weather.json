@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-25 17:45 UTC",
-  "generated_at": "2026-11-25T17:45:35Z",
-  "valid_until": "2026-11-25T20:15:35Z",
+  "timestamp": "2026-11-25 18:01 UTC",
+  "generated_at": "2026-11-25T18:01:04Z",
+  "valid_until": "2026-11-25T20:31:04Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 3.41,
+  "run_duration_seconds": 11.97,
   "symbol": "⛅",
-  "composite_score": 46,
-  "composite_raw": 46.5,
-  "composite_weighted": 33.7,
-  "storm_floor": 46.5,
+  "composite_score": 42,
+  "composite_raw": 42.75,
+  "composite_weighted": 32.7,
+  "storm_floor": 42.75,
   "storm_floor_active": true,
   "storm_driver": "market_volatility",
-  "display_score": 46,
+  "display_score": 42,
   "status": "SCATTERED CLOUDS",
   "desc": "Operational noise within standard ranges. No immediate systemic fracture.",
   "color": "#ffcc00",
@@ -64,12 +64,12 @@
   },
   "transition": {
     "previous_status": "PAUSED",
-    "candidate_status": "PAUSED",
+    "candidate_status": "CAUTION",
     "required_runs": 2,
     "cold_start": false,
-    "confirmed_runs": 0,
-    "recovering": false,
-    "recovery_target": null,
+    "confirmed_runs": 1,
+    "recovering": true,
+    "recovery_target": "CAUTION",
     "status_changed": false,
     "market_status": "PAUSED",
     "clean_runs": 2
@@ -78,14 +78,14 @@
     "grid_bots": {
       "status": "PAUSED",
       "color": "#ff0033",
-      "action": "Staying paused until overall, volatility, and crypto scores fall below 58.",
+      "action": "Staying paused: recovery pending (1/2 confirmations).",
       "hysteresis": true,
-      "confirmed_runs": 0
+      "confirmed_runs": 1
     },
     "dip_buying": {
-      "status": "DEFENSIVE",
-      "color": "#ff6600",
-      "action": "Support looks fragile; falling-knife risk is elevated."
+      "status": "FAVORABLE",
+      "color": "#00ff66",
+      "action": "Orderly pullbacks. Liquidity supports absorption."
     },
     "crypto_perps": {
       "status": "NOMINAL",
@@ -105,9 +105,9 @@
   },
   "pillars": {
     "market_volatility": {
-      "score": 62,
-      "vix": 31.34,
-      "move_index": 102.73,
+      "score": 57,
+      "vix": 29.85,
+      "move_index": 100.42,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
@@ -115,9 +115,9 @@
     "crypto_leverage": {
       "score": 30,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2114.0,
-      "btc_24h_change_pct": -0.6,
-      "dvol_index": 55.9,
+      "btc_oi_mil": 2114.3,
+      "btc_24h_change_pct": -0.84,
+      "dvol_index": 55.7,
       "funding_stress": 8,
       "dvol_stress": 36,
       "price_shock_stress": 0,
@@ -160,9 +160,9 @@
       "cbp_fallback": false
     },
     "market_implied": {
-      "score": 62,
-      "vix": 31.34,
-      "move_index": 102.73,
+      "score": 57,
+      "vix": 29.85,
+      "move_index": 100.42,
       "fallback": false,
       "vix_fallback": false,
       "move_fallback": false
@@ -170,9 +170,9 @@
     "crypto_247": {
       "score": 30,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2114.0,
-      "btc_24h_change_pct": -0.6,
-      "dvol_index": 55.9,
+      "btc_oi_mil": 2114.3,
+      "btc_24h_change_pct": -0.84,
+      "dvol_index": 55.7,
       "funding_stress": 8,
       "dvol_stress": 36,
       "price_shock_stress": 0,
