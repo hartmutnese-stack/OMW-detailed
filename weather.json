@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-25 08:15 UTC",
-  "generated_at": "2026-11-25T08:15:36Z",
-  "valid_until": "2026-11-25T10:45:36Z",
+  "timestamp": "2026-11-25 08:25 UTC",
+  "generated_at": "2026-11-25T08:25:45Z",
+  "valid_until": "2026-11-25T10:55:45Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 4.24,
+  "run_duration_seconds": 2.55,
   "symbol": "⛅",
   "composite_score": 36,
   "composite_raw": 36.75,
-  "composite_weighted": 31.0,
+  "composite_weighted": 31.2,
   "storm_floor": 36.75,
   "storm_floor_active": true,
   "storm_driver": "market_volatility",
@@ -91,7 +91,7 @@
     "crypto_perps": {
       "status": "HEAVY SHORT",
       "color": "#ff6600",
-      "action": "Negative perp funding (-10.9% APR). Potential short squeeze."
+      "action": "Negative perp funding (-11.4% APR). Potential short squeeze."
     },
     "dark_pool": {
       "status": "NOMINAL",
@@ -114,14 +114,14 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 38,
-      "btc_funding_apr": -10.9,
-      "btc_oi_mil": 2077.0,
-      "btc_24h_change_pct": -2.22,
-      "dvol_index": 54.1,
-      "funding_stress": 43,
-      "dvol_stress": 31,
-      "price_shock_stress": 2,
+      "score": 39,
+      "btc_funding_apr": -11.4,
+      "btc_oi_mil": 2085.4,
+      "btc_24h_change_pct": -1.96,
+      "dvol_index": 54.3,
+      "funding_stress": 44,
+      "dvol_stress": 32,
+      "price_shock_stress": 0,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -169,14 +169,14 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 38,
-      "btc_funding_apr": -10.9,
-      "btc_oi_mil": 2077.0,
-      "btc_24h_change_pct": -2.22,
-      "dvol_index": 54.1,
-      "funding_stress": 43,
-      "dvol_stress": 31,
-      "price_shock_stress": 2,
+      "score": 39,
+      "btc_funding_apr": -11.4,
+      "btc_oi_mil": 2085.4,
+      "btc_24h_change_pct": -1.96,
+      "dvol_index": 54.3,
+      "funding_stress": 44,
+      "dvol_stress": 32,
+      "price_shock_stress": 0,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
