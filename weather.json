@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-26 01:01 UTC",
-  "generated_at": "2026-11-26T01:01:13Z",
-  "valid_until": "2026-11-26T03:31:13Z",
+  "timestamp": "2026-11-26 01:15 UTC",
+  "generated_at": "2026-11-26T01:15:34Z",
+  "valid_until": "2026-11-26T03:45:34Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 22.15,
+  "run_duration_seconds": 4.19,
   "symbol": "⛅",
   "composite_score": 39,
   "composite_raw": 39.0,
-  "composite_weighted": 38.05,
+  "composite_weighted": 37.25,
   "storm_floor": 39.0,
   "storm_floor_active": true,
   "storm_driver": "market_volatility",
@@ -72,7 +72,7 @@
     "recovery_target": null,
     "status_changed": false,
     "market_status": "CAUTION",
-    "clean_runs": 1
+    "clean_runs": 2
   },
   "tactical_posture": {
     "grid_bots": {
@@ -113,13 +113,13 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 22,
+      "score": 18,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2230.7,
-      "btc_24h_change_pct": 1.42,
-      "dvol_index": 52.2,
+      "btc_oi_mil": 2240.4,
+      "btc_24h_change_pct": 1.8,
+      "dvol_index": 50.4,
       "funding_stress": 8,
-      "dvol_stress": 26,
+      "dvol_stress": 22,
       "price_shock_stress": 0,
       "fallback": false,
       "hl_fallback": false,
@@ -168,13 +168,13 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 22,
+      "score": 18,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2230.7,
-      "btc_24h_change_pct": 1.42,
-      "dvol_index": 52.2,
+      "btc_oi_mil": 2240.4,
+      "btc_24h_change_pct": 1.8,
+      "dvol_index": 50.4,
       "funding_stress": 8,
-      "dvol_stress": 26,
+      "dvol_stress": 22,
       "price_shock_stress": 0,
       "fallback": false,
       "hl_fallback": false,
