@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-27 12:45 UTC",
-  "generated_at": "2026-11-27T12:45:40Z",
-  "valid_until": "2026-11-27T15:15:40Z",
+  "timestamp": "2026-11-27 13:01 UTC",
+  "generated_at": "2026-11-27T13:01:04Z",
+  "valid_until": "2026-11-27T15:31:04Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 3.38,
+  "run_duration_seconds": 3.81,
   "symbol": "⛅",
   "composite_score": 34,
   "composite_raw": 34.5,
@@ -78,7 +78,7 @@
     "grid_bots": {
       "status": "CAUTION",
       "color": "#ffcc00",
-      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 25.43 >= 20).",
+      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 25.46 >= 20).",
       "hysteresis": false,
       "confirmed_runs": 0
     },
@@ -106,7 +106,7 @@
   "pillars": {
     "market_volatility": {
       "score": 46,
-      "vix": 25.43,
+      "vix": 25.46,
       "move_index": 97.54,
       "fallback": false,
       "vix_fallback": false,
@@ -115,8 +115,8 @@
     "crypto_leverage": {
       "score": 13,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2336.4,
-      "btc_24h_change_pct": 1.06,
+      "btc_oi_mil": 2347.8,
+      "btc_24h_change_pct": 1.32,
       "dvol_index": 48.2,
       "funding_stress": 8,
       "dvol_stress": 16,
@@ -161,7 +161,7 @@
     },
     "market_implied": {
       "score": 46,
-      "vix": 25.43,
+      "vix": 25.46,
       "move_index": 97.54,
       "fallback": false,
       "vix_fallback": false,
@@ -170,8 +170,8 @@
     "crypto_247": {
       "score": 13,
       "btc_funding_apr": 11.0,
-      "btc_oi_mil": 2336.4,
-      "btc_24h_change_pct": 1.06,
+      "btc_oi_mil": 2347.8,
+      "btc_24h_change_pct": 1.32,
       "dvol_index": 48.2,
       "funding_stress": 8,
       "dvol_stress": 16,
