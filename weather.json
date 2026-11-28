@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-28 13:30 UTC",
-  "generated_at": "2026-11-28T13:30:45Z",
-  "valid_until": "2026-11-28T16:00:45Z",
+  "timestamp": "2026-11-28 13:45 UTC",
+  "generated_at": "2026-11-28T13:45:32Z",
+  "valid_until": "2026-11-28T16:15:32Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 2.54,
+  "run_duration_seconds": 2.77,
   "symbol": "⛅",
   "composite_score": 31,
   "composite_raw": 31.3,
@@ -90,7 +90,7 @@
     "crypto_perps": {
       "status": "HEAVY SHORT",
       "color": "#ff6600",
-      "action": "Negative perp funding (-7.2% APR). Potential short squeeze."
+      "action": "Negative perp funding (-7.7% APR). Potential short squeeze."
     },
     "dark_pool": {
       "status": "NOMINAL",
@@ -114,13 +114,13 @@
     },
     "crypto_leverage": {
       "score": 30,
-      "btc_funding_apr": -7.2,
-      "btc_oi_mil": 2116.6,
-      "btc_24h_change_pct": -3.64,
-      "dvol_index": 53.4,
-      "funding_stress": 30,
+      "btc_funding_apr": -7.7,
+      "btc_oi_mil": 2149.3,
+      "btc_24h_change_pct": -3.97,
+      "dvol_index": 53.7,
+      "funding_stress": 31,
       "dvol_stress": 30,
-      "price_shock_stress": 20,
+      "price_shock_stress": 24,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -169,13 +169,13 @@
     },
     "crypto_247": {
       "score": 30,
-      "btc_funding_apr": -7.2,
-      "btc_oi_mil": 2116.6,
-      "btc_24h_change_pct": -3.64,
-      "dvol_index": 53.4,
-      "funding_stress": 30,
+      "btc_funding_apr": -7.7,
+      "btc_oi_mil": 2149.3,
+      "btc_24h_change_pct": -3.97,
+      "dvol_index": 53.7,
+      "funding_stress": 31,
       "dvol_stress": 30,
-      "price_shock_stress": 20,
+      "price_shock_stress": 24,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
