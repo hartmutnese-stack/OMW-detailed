@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-28 05:30 UTC",
-  "generated_at": "2026-11-28T05:30:46Z",
-  "valid_until": "2026-11-28T08:00:46Z",
+  "timestamp": "2026-11-28 05:45 UTC",
+  "generated_at": "2026-11-28T05:45:33Z",
+  "valid_until": "2026-11-28T08:15:33Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 1.96,
+  "run_duration_seconds": 3.5,
   "symbol": "⛅",
   "composite_score": 31,
-  "composite_raw": 31.2,
-  "composite_weighted": 31.2,
+  "composite_raw": 31.6,
+  "composite_weighted": 31.6,
   "storm_floor": 30.75,
   "storm_floor_active": false,
   "storm_driver": null,
@@ -90,7 +90,7 @@
     "crypto_perps": {
       "status": "NOMINAL",
       "color": "#00ff66",
-      "action": "Moderate derivatives bias (-1.5% APR)."
+      "action": "Moderate derivatives bias (-3.3% APR)."
     },
     "dark_pool": {
       "status": "NOMINAL",
@@ -113,14 +113,14 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 24,
-      "btc_funding_apr": -1.5,
-      "btc_oi_mil": 2099.5,
-      "btc_24h_change_pct": -3.19,
-      "dvol_index": 52.7,
-      "funding_stress": 22,
+      "score": 26,
+      "btc_funding_apr": -3.3,
+      "btc_oi_mil": 2111.3,
+      "btc_24h_change_pct": -3.32,
+      "dvol_index": 52.8,
+      "funding_stress": 25,
       "dvol_stress": 28,
-      "price_shock_stress": 14,
+      "price_shock_stress": 16,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -168,14 +168,14 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 24,
-      "btc_funding_apr": -1.5,
-      "btc_oi_mil": 2099.5,
-      "btc_24h_change_pct": -3.19,
-      "dvol_index": 52.7,
-      "funding_stress": 22,
+      "score": 26,
+      "btc_funding_apr": -3.3,
+      "btc_oi_mil": 2111.3,
+      "btc_24h_change_pct": -3.32,
+      "dvol_index": 52.8,
+      "funding_stress": 25,
       "dvol_stress": 28,
-      "price_shock_stress": 14,
+      "price_shock_stress": 16,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
