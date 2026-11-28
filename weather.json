@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
   "version": "3.7.3",
-  "timestamp": "2026-11-28 11:45 UTC",
-  "generated_at": "2026-11-28T11:45:39Z",
-  "valid_until": "2026-11-28T14:15:39Z",
+  "timestamp": "2026-11-28 12:00 UTC",
+  "generated_at": "2026-11-28T12:00:56Z",
+  "valid_until": "2026-11-28T14:30:56Z",
   "run_status": "COMPLETE",
-  "run_duration_seconds": 2.98,
+  "run_duration_seconds": 4.12,
   "symbol": "⛅",
-  "composite_score": 35,
-  "composite_raw": 35.25,
-  "composite_weighted": 34.7,
-  "storm_floor": 35.25,
+  "composite_score": 30,
+  "composite_raw": 30.75,
+  "composite_weighted": 30.1,
+  "storm_floor": 30.75,
   "storm_floor_active": true,
-  "storm_driver": "crypto_leverage",
-  "display_score": 35,
+  "storm_driver": "market_volatility",
+  "display_score": 30,
   "status": "SCATTERED CLOUDS",
   "desc": "Operational noise within standard ranges. No immediate systemic fracture.",
   "color": "#ffcc00",
@@ -64,14 +64,14 @@
     }
   },
   "transition": {
-    "previous_status": "PAUSED",
+    "previous_status": "CAUTION",
     "candidate_status": "CAUTION",
     "required_runs": 2,
     "cold_start": false,
-    "confirmed_runs": 2,
+    "confirmed_runs": 0,
     "recovering": false,
     "recovery_target": null,
-    "status_changed": true,
+    "status_changed": false,
     "market_status": "CAUTION",
     "clean_runs": 2
   },
@@ -79,9 +79,9 @@
     "grid_bots": {
       "status": "CAUTION",
       "color": "#ffcc00",
-      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (overall 35.2 >= 35, VIX 23.81 >= 20, crypto 47 >= 40).",
+      "action": "Reference: wider grid bands (+15-25%), smaller sizes or leverage (VIX 23.81 >= 20).",
       "hysteresis": false,
-      "confirmed_runs": 2
+      "confirmed_runs": 0
     },
     "dip_buying": {
       "status": "FAVORABLE",
@@ -89,9 +89,9 @@
       "action": "Orderly pullbacks. Liquidity supports absorption."
     },
     "crypto_perps": {
-      "status": "HEAVY SHORT",
-      "color": "#ff6600",
-      "action": "Negative perp funding (-14.7% APR). Potential short squeeze."
+      "status": "NOMINAL",
+      "color": "#00ff66",
+      "action": "Neutral baseline funding (+11.0% APR)."
     },
     "dark_pool": {
       "status": "NOMINAL",
@@ -114,14 +114,14 @@
       "move_fallback": false
     },
     "crypto_leverage": {
-      "score": 47,
-      "btc_funding_apr": -14.7,
-      "btc_oi_mil": 2125.5,
-      "btc_24h_change_pct": -4.03,
+      "score": 24,
+      "btc_funding_apr": 11.0,
+      "btc_oi_mil": 2127.3,
+      "btc_24h_change_pct": -3.8,
       "dvol_index": 53.3,
-      "funding_stress": 56,
+      "funding_stress": 8,
       "dvol_stress": 29,
-      "price_shock_stress": 25,
+      "price_shock_stress": 22,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
@@ -169,14 +169,14 @@
       "move_fallback": false
     },
     "crypto_247": {
-      "score": 47,
-      "btc_funding_apr": -14.7,
-      "btc_oi_mil": 2125.5,
-      "btc_24h_change_pct": -4.03,
+      "score": 24,
+      "btc_funding_apr": 11.0,
+      "btc_oi_mil": 2127.3,
+      "btc_24h_change_pct": -3.8,
       "dvol_index": 53.3,
-      "funding_stress": 56,
+      "funding_stress": 8,
       "dvol_stress": 29,
-      "price_shock_stress": 25,
+      "price_shock_stress": 22,
       "fallback": false,
       "hl_fallback": false,
       "dvol_fallback": false
